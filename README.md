@@ -1,2 +1,4 @@
 # sb2648-is601-007
-This repository contians tasks given in Webs system Development Howework Assignment 1 
+## Course name : Web Systems and Development
+This is a readme file for the first assignment of Web system development
+ 
