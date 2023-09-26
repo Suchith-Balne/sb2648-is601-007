@@ -10,9 +10,11 @@ def process_array(num, arr):
     total = 0.00
     # Note: use the arr variable; don't directly refer to a1-a4 variables
     # TODO add necessary code here for sum; every number must have two decimal places shown (i.e., 0.10, 0.01, 0.00)
-    for (i) in arr:
-        total += round(i, 2)
-    print("\nThe total is {:.2f}:\n".format(total))
+    # Date: 9/23/23, UCID: sb2648
+    # Iterating over an array to perform addition of all the elements after rounding each value to two decimal places.
+    for i in arr:
+        total += i
+    print("\nThe total is {:.2f}:\n".format(round(total,2))) # Prints out the total summation of an array which is formatted to 2 decimal places.
 
 
 print("Problem 2")
