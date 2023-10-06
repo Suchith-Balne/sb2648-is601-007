@@ -54,11 +54,20 @@ def list_tasks(_tasks):
 def add_task(name: str, description: str, due: str):
     """ Copies the TASK_TEMPLATE and fills in the passed in data then adds the task to the tasks list """
     task = TASK_TEMPLATE.copy() # don't delete this; use this task reference for the below requirements
-    # update lastActivity with the current datetime value
-    # set the name, description, and due date (all must be provided)
-    # due date must match one of the formats mentioned in str_to_datetime()
-    # add the new task to the tasks list
-    # output a message confirming the new task was added or if the addition was rejected due to missing data based on the prior checks
+    try:
+        # update lastActivity with the current datetime value
+        task["lastActivity"] = datetime.now().strftime("%m/%d/%Y %H:%M:%S")
+        # set the name, description, and due date (all must be provided)
+        task["name"] = name
+        task["description"] = description
+        task["due"] = str_to_datetime(due)
+        # due date must match one of the formats mentioned in str_to_datetime()
+        # add the new task to the tasks list
+        tasks.append(task)
+        print("Task has been added successfully!!")
+        # output a message confirming the new task was added or if the addition was rejected due to missing data based on the prior checks
+    except Exception as e:
+        print("Enter valid input", e)
     # make sure save() is still called last in this function
     # include your ucid and date as a comment of when you implemented this, briefly summarize the solution
     # make sure any checks/conditions clearly display an appropriate message of what failed
@@ -70,7 +79,13 @@ def process_update(index):
     # consider index out of bounds scenarios and include appropriate message(s) for invalid index
     # show the existing value of each property where the TODOs are marked in the text of the inputs below (replace the TODO related text with the found tasks's data)
     # include your ucid and date as a comment of when you implemented this, briefly summarize the solution
-    
+    try:
+        name, desc, due = tasks[index]
+        print("Task name:" + name)
+        print("Task Description:" + desc)
+        print("Task Due date:" + due)
+    except Exception as e:
+        print("Exception in update on index", e)
     name = input(f"What's the name of this task? (TODO name) \n").strip()
     desc = input(f"What's a brief descriptions of this task? (TODO description) \n").strip()
     due = input(f"When is this task due (format: m/d/y H:M:S) (TODO due) \n").strip()
@@ -78,7 +93,16 @@ def process_update(index):
 
 def update_task(index: int, name: str, description:str, due: str):
     """ Updates the name, description , due date of a task found by index if an update to the property was provided """
-    # find the task by index
+    try:
+        # find the task by index
+        task = tasks[index] 
+        task["name"] = name
+        task["description"] = description
+        task["due"] = due
+        task["lastActivity"] = datetime.now().strftime("%m/%d/%Y %H:%M:%S")
+        print("Updated the task Successfully")
+    except Exception as e:
+        print("Exception for the index", e) 
     # consider index out of bounds scenarios and include appropriate message(s) for invalid index
     # update incoming task data if it's provided (if it's not provided use the original task property value)
     # update lastActivity with the current datetime value
@@ -105,7 +129,7 @@ def view_task(index):
     # consider index out of bounds scenarios and include appropriate message(s) for invalid index
     # utilize the given print statement when a task is found
     # include your ucid and date as a comment of when you implemented this, briefly summarize the solution
-    task = {} # <-- replace or update the assignment of this variable, I just used an empty dict so it would run without changes
+    task = tasks[index] # <-- replace or update the assignment of this variable, I just used an empty dict so it would run without changes
     print(f"""
         [{'x' if task['done'] else ' '}] Task: {task['name']}\n 
         Description: {task['description']} \n 
@@ -122,7 +146,11 @@ def delete_task(index):
     # consider index out of bounds scenarios and include appropriate message(s) for invalid index
     # make sure save() is still called last in this function
     # include your ucid and date as a comment of when you implemented this, briefly summarize the solution
-    
+    try:
+        del tasks[index]
+        print("Successfully deleted the selected task")
+    except Exception as e:
+        print("Select valid item from the task list")
     save()
 
 def get_incomplete_tasks():
