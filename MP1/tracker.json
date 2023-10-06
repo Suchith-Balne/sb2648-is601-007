@@ -1,9 +1,23 @@
 [
     {
-        "name": "Pizza eating",
-        "due": "2023-10-05 20:25:52",
-        "lastActivity": "05/10/2023 19:37:41",
-        "description": "eating pizza",
+        "name": "Task1",
+        "due": "10/06/23 18:00:00",
+        "lastActivity": "10/06/23 17:21:33",
+        "description": "Attend class",
         "done": false
+    },
+    {
+        "name": "pending task",
+        "due": "10/06/23 13:00:00",
+        "lastActivity": "10/06/23 17:42:42",
+        "description": "Buy grocieris",
+        "done": false
+    },
+    {
+        "name": "pending task1",
+        "due": "10/06/23 17:30:30",
+        "lastActivity": "10/06/23 17:45:22",
+        "description": "Pending tasks list one item",
+        "done": true
     }
 ]
