@@ -54,63 +54,69 @@ def list_tasks(_tasks):
 def add_task(name: str, description: str, due: str):
     """ Copies the TASK_TEMPLATE and fills in the passed in data then adds the task to the tasks list """
     task = TASK_TEMPLATE.copy() # don't delete this; use this task reference for the below requirements
+
+    task["lastActivity"] = datetime.now().strftime('%m/%d/%y %H:%M:%S')     # Last activity update with current time.
+    task["name"] = name                                                     # Name attribute update.
+    task["description"] = description                                       # Description attribute update.
     try:
-        task["lastActivity"] = datetime.now().strftime('%m/%d/%y %H:%M:%S')
-        task["name"] = name
-        task["description"] = description
-        task["due"] = str_to_datetime(due).strftime('%m/%d/%y %H:%M:%S')
-        tasks.append(task)
-        print("\nTask has been added successfully!\n")
-    except Exception as e:
-        print("You have entered invalid", e)
+        task["due"] = str_to_datetime(due).strftime('%m/%d/%y %H:%M:%S')    # Due date update.
+    except ValueError:
+        print("\n*** Failed to add task due to Invalid date format ***\n")  # Throws Invalid date format exception.
+        return
+    if '' in task.values():                                                 # Checks for any empty values in the task.
+        print("\n*** Failed to add task due to missing values in the input.***") # Task will not be added if any missing values are found.
+    else:
+        tasks.append(task)                                                  # Task will be added to task list if inputs are valid.
+        print("\n*** Task has been added successfully! ***\n")
+    
     # UCID: sb2648, Date: 10/05/2023
-    '''In this method new task to be addded to the task list. 
+    '''New task will be added to the task list. 
     For this we have set name, description and due date attributes to the task instance and added this dictionary to the tasks list and finally save method is called.
-    An exception is printed if any of the invalid inputs are provided to this method. 
+    Task will not be added if any of the invalid inputs are provided to this method. 
     '''
     save()
 
 def process_update(index):
     """ extracted the user input prompts to get task data then passes it to update_task() """
     """ UCID:sb2648, Date: 10/05/2023
-        Here, in this method if the given index is greater than or equals to zero then we retreive the current task details and the information is shown to the user.
+        Here, in this method if the given index is greater than or equals to zero and less than length of the tasks list then we retreive the current task details and the information is shown to the user.
         User is prompted to enter name, description and Due date details for the task update. Provided information is given to update_task function to update the task in task list.
         Incase, the index is invalid then a message is shown to user to select valid index to perform task update.
     """
+    if index < 0 or index > len(tasks):
+        print("\n *** No task found at the provided index, please try with a valid index **")
+        return
     try:
-        if index >= 0:
-            selected_task = tasks[index]
-            curr_name, curr_due, curr_lastActivity,curr_description, curr_status = selected_task.values()
-            print("\n Task details for selected taski shown below: \n")
-            print("Task name:" + curr_name)
-            print("Task Description:" + curr_description)
-            print("Task Due date:" + curr_due)
-            name = input(f"What's the name of this task? (TODO name) \n").strip()
-            desc = input(f"What's a brief descriptions of this task? (TODO description) \n").strip()
-            due = input(f"When is this task due (format: m/d/y H:M:S) (TODO due) \n").strip()
-            if len(name)!=0 and  len(desc)!=0 and len(due)!=0:
-                update_task(index, name=name, description=desc, due=due)
-            else:
-                print("No updates are provided, task was not updated!")
-    except Exception as e:
-        print("{} exception occured as no task found at provied index".format(e))
+        if index > 0 and index <= len(tasks):          # Checks the index if it is greater than zero and less than or equal to length of the list.
+            selected_task = tasks[index]                # Retreives the task information for the selected index.
+            curr_name, curr_due, curr_lastActivity,curr_description, curr_status = selected_task.values() # Retreiving the values of the attributes.
+            name = input(f"What's the name of this task? ({curr_name}) \n").strip() # Shows the current task name and new input is taken.
+            desc = input(f"What's a brief descriptions of this task? ({curr_description}) \n").strip() # Shows the current task Description new input is taken.
+            due = input(f"When is this task due (format: m/d/y H:M:S) ({curr_due}) \n").strip() # Shows the current task due date new input is taken.
+            update_task(index, name = name, description = desc, due = due) # Updates the task with provided information new input is taken.
+    except IndexError:          # Handled out of bound exception and a message is shown to user to select valid index.
+        print("\n *** No task found.Failed to process update request, please try again with valid index *** \n")
 
 def update_task(index: int, name: str, description:str, due: str):
     """ Updates the name, description , due date of a task found by index if an update to the property was provided """
     
     """ UCID: sb2648, Date: 10/06/2023
+        Retreiving the task for the provided index and the update of new attributes are performed if new values are provided.
         Performs the task update at the provided index.
-        Prints an exception if any invalid information is provided for the update task.
+        Prints a valid message for an exception if any invalid information is provided for the update task.
     """
     try:
-        curr_task = tasks[index]
-        curr_task["name"] = name
-        curr_task["description"] = description
-        curr_task["due"] = due
-        curr_task["lastActivity"] = datetime.now().strftime('%m/%d/%y %H:%M:%S')
-        print("\nUpdated the task Successfully!\n")
-    except Exception as e:
-        print("Exception occured", e)
+        if len(name)!= 0 or  len(description)!= 0 or len(due) != 0: # Checks if any updates are provided to the attributes
+            curr_task = tasks[index]    # Retrives the task from the task list from the provided index
+            curr_task["name"] = name    # Updates the current task with the new task name.
+            curr_task["description"] = description # Updates the current task with the new task description.
+            curr_task["due"] = due      # Updates the current task with the new task due.
+            curr_task["lastActivity"] = datetime.now().strftime('%m/%d/%y %H:%M:%S') # Updates last Activity with the current date and time.
+            print("\n*** Updated the task Successfully! ***\n")
+        else:   
+            curr_task["lastActivity"] = datetime.now().strftime('%m/%d/%y %H:%M:%S') # If no updates are provided then last activity is updates with current date and time.
+    except Exception:
+        print("\n *** No new updates were provided *** \n")
     
     save()
 
@@ -118,38 +124,40 @@ def mark_done(index):
     """ Updates a single task, via index, to a done datetime"""
     
     """ UCID: sb2648, Date: 10/06/2023 
-    In this function, task at given index is retreived and if the task is already completed then we print a message to the user saying that task is already completed.
-    If the task is not completed then we mark the task as done and lastActivity attribute is updated with current date and time. 
+    In this function, task at given index is retrieved and if the task is already completed then we print a message to the user saying that task is already completed.
+    If the task is not completed then we mark the task as done by updating done attribute with current date and time. 
     Index out of bounds is handled and a message is shown to user to select a valid task.
     """
     try:
-        task = tasks[index]
-        curr_name, curr_due, curr_lastActivity,curr_description, curr_status = task.values()
-        if curr_status:
-            print("This task is already completed!")
+        task = tasks[index] # Retreives the task form the task list at the provided index.
+        if not task["done"]:    # Checks for the done attribute is false.
+            task["done"] = datetime.now().strftime('%m/%d/%y %H:%M:%S')     # Updates the task as done with current date time if it is not already completed.
+            print("\n*** Task is marked as done at {} ***\n".format(task["done"]))
         else:
-            task["done"] = True
-            task["lastActivity"] = datetime.now().strftime('%m/%d/%y %H:%M:%S')
-            print("Task is marked as done at {}".format(task["lastActivity"]))
-    except Exception as e:
-        print("Exception occured due to {}, select a valid task".format(e))
+            print("\n*** This task is already completed! ***\n")    # Prints the message as already completed if task is already completed.
+    except Exception:
+        print("\n *** No task found at the provided index, select a valid index. *** \n") # Handled exception for list out of bounds.
 
     save()
 
 def view_task(index):
     """ View more info about a specific task fetch by index """
 
-    """ UCID: sb2648, Date: 10/06/2023
-    Retrieved the task for the given index and the formatted task information is printed on the console
+    """ UCID: sb2648, Date: 10/05/2023
+    Retrieved the task for the given index and the formatted task information is printed on the console.
+    If any exception occured for invalid index then a message is shown to the user that user selected invalid index.
     """
-    task = tasks[index]
-    print(f"""
-        [{'x' if task['done'] else ' '}] Task: {task['name']}\n 
-        Description: {task['description']} \n 
-        Last Activity: {task['lastActivity']} \n
-        Due: {task['due']}\n
-        Completed: {task['done'] if task['done'] else '-'} \n
-        """.replace('  ', ' '))
+    try:
+        task = tasks[index] # Select the task from the provided index
+        print(f"""
+            [{'x' if task['done'] else ' '}] Task: {task['name']}\n 
+            Description: {task['description']} \n 
+            Last Activity: {task['lastActivity']} \n
+            Due: {task['due']}\n
+            Completed: {task['done'] if task['done'] else '-'} \n
+            """.replace('  ', ' ')) # Prints the output of the selected task.
+    except Exception:
+        print("\n*** No task found at the provided index, select a valid index to view the task ***\n")
 
 
 def delete_task(index):
@@ -160,21 +168,22 @@ def delete_task(index):
     Index out of bound exception is handled and a message is shown to select a valid input to delete the task from the list.
     """
     try:
-        del tasks[index]
-        print("Successfully deleted the selected task!")
+        del tasks[index]    # Deletes selected task form the task list.
+        print("\n*** Successfully deleted the selected task!***\n")
     except Exception as e:
-        print("{} occured, select valid item from the task list for deletion".format(e))
+        print("\n ** No task found at the selected index, Select valid item from the task list for deletion **\n")
     save()
 
 def get_incomplete_tasks():
     """ prints a list of tasks that are not done """
     
     """UCID:sb2648, Date:10/06/23
-    We get the tasks which are not marked as done and those tasks are added to _tasks list and this list is given to list_task() function.
+    We get the tasks which are not marked as done i.e, marked as False and those tasks are added to _tasks list and this list is given to list_task()function.
     """
     _tasks = []
+
     for each_task in tasks:
-        if each_task["done"] == False:
+        if not each_task["done"]: 
             _tasks.append(each_task)
     list_tasks(_tasks)
 
@@ -182,7 +191,8 @@ def get_overdue_tasks():
     """ prints a list of tasks that are over due completion (not done and expired) """
     
     """ UCID:sb2648, Date: 10/06/23
-    Here, we are iterating over the list of tasks and we consider the tasks which are not marked as done and which are older than the current date and time. For this we take the difference of current time and due date for the task.
+    Here, we are iterating over the list of tasks and we consider the tasks which are not marked as done and which are older than the current date and time. 
+    For this we take the difference of current time and due date for the task.
     These tasks are added to a list and are passed to the list_tasks().
     """
     # generate a list of tasks where the due date is older than "now" and that are not complete (i.e., not done)
@@ -219,7 +229,7 @@ def get_time_remaining(index):
         minutes, seconds = divmod(remainder, 60)
         print(f"{days} days, {hours} hours, {minutes} minutes, {seconds} seconds {overdue_message}")
     except Exception as e:
-        print("{} occured, select valid item from the task list to get remaining time".format(e))
+        print("\n*** No tasks found at the selected index. Select valid item from the task list to get remaining time ***\n")
 
 command_list = ["add", "view", "update", "list", "incomplete", "overdue", "delete", "remaining", "help", "quit", "exit", "done"]
 def print_options():
