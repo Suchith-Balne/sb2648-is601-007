@@ -1,0 +1,37 @@
+[
+    {
+        "name": "Attend web systems and design class",
+        "due": "10/09/23 16:00:00",
+        "lastActivity": "10/09/23 11:30:15",
+        "description": "Must attend Web systems and Design class",
+        "done": "10/09/23 14:37:29"
+    },
+    {
+        "name": "Exercise",
+        "due": "10/09/23 14:00:00",
+        "lastActivity": "10/09/23 13:11:15",
+        "description": "Exercising is good for health",
+        "done": "10/09/23 14:37:34"
+    },
+    {
+        "name": "Gym",
+        "due": "10/09/23 08:00:00",
+        "lastActivity": "10/09/23 13:45:48",
+        "description": "Weight triaining exercises",
+        "done": "10/09/23 13:49:51"
+    },
+    {
+        "name": "Cricket",
+        "due": "10/09/23 10:00:00",
+        "lastActivity": "10/09/23 15:29:58",
+        "description": "Play cricket",
+        "done": "10/09/23 15:38:41"
+    },
+    {
+        "name": "Presentation",
+        "due": "10/10/23 11:00:00",
+        "lastActivity": "10/09/23 15:31:06",
+        "description": "Present presentation on cloud computing",
+        "done": false
+    }
+]
