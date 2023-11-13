@@ -2,18 +2,20 @@
 {% block title %}Assign Roles{% endblock %}
 {% block content %}
 <div class="container-fluid">
-    <div class="h1">Assign Roles</div>
-    <form method="GET">
-        <input type="text" placeholder="Partial email address"
-            value="{{request.args.get('email', '')}}" name="email" />
-        <input type="submit" class="btn btn-secondary" value="Search" />
-    </form>
-    <form id="apply" method="POST"
-        action="{{url_for('roles.apply')}}?email={{request.args.get('email', '')}}">
-        <!-- will map elements via form attribute on the element itself by form id -->
-        <input type="submit" class="btn btn-primary" value="Apply Roles" />
-    </form>
-    <table class="table">
+    <div class="h1 display-4 text-center">Assign Roles</div>
+    <div class="container m-2">
+        <form method="GET">
+            <input type="text" placeholder="Partial email address"
+                value="{{request.args.get('email', '')}}" name="email" />
+            <input type="submit" class="btn btn-secondary" value="Search" />
+        </form>
+        <form id="apply" method="POST"
+            action="{{url_for('roles.apply')}}?email={{request.args.get('email', '')}}">
+            <!-- will map elements via form attribute on the element itself by form id -->
+            <input type="submit" class="btn btn-primary" value="Apply Roles" />
+        </form>
+    </div>
+    <table class="table table-bordered table-striped table-hover">
         <thead>
             <tr>
                 <td>Users</td>
