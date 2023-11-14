@@ -1,15 +1,13 @@
 import pytest
 
-
-
 @pytest.fixture()
 def app():
     from ..main import create_app
     from ..sql.db import DB
     app = create_app()
-    """app.config.update({
+    app.config.update({
         "TESTING": True,
-    })"""
+    })
     # insert dummy record to test at a negative index so it doesn't collide with valid values
     # note: this will likely still trigger auto_increment
     DB.insertOne("INSERT INTO IS601_Sample (id, name, val) VALUES (-1, 'tc','tcval')")
