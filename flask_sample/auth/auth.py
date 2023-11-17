@@ -16,7 +16,7 @@ auth = Blueprint('auth', __name__, url_prefix='/',template_folder='templates')
 def check_duplicate(e):
 
     import re
-    r = re.match(".*IS601_Users.(\w+)", str(e))
+    r = re.match(".*IS601_Users.(\w+)", e.args[0].args[1])
     if r:
         flash(f"The chosen {r.group(1   )} is not available", "warning")
     else:
