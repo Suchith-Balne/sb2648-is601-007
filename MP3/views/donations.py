@@ -1,4 +1,5 @@
-import datetime
+from datetime import datetime, timedelta
+import re
 from flask import Blueprint, redirect, render_template, request, flash, url_for
 from sql.db import DB
 donations = Blueprint('donations', __name__, url_prefix='/donations')
@@ -102,35 +103,111 @@ def search():
 @donations.route("/add", methods=["GET","POST"])
 def add():
     if request.method == "POST":
-        # TODO add-1 retrieve form data for donor_firstname, donor_lastname, donor_email, organization_id, item_name, item_description, item_quantity, donation_date, comments
+        # UCID: sb2648
+        # add-1 retrieve form data for donor_firstname, donor_lastname, donor_email, organization_id, item_name, item_description, item_quantity, donation_date, comments
+        donor_firstname = request.form.get("donor_firstname")
+        donor_lastname = request.form.get("donor_lastname")
+        donor_email = request.form.get("donor_email")
+        organization_id = request.form.get("organization_id")
+        item_name = request.form.get("item_name")
+        item_description = request.form.get("item_description")
+        item_quantity = request.form.get("item_quantity")
+        donation_date = request.form.get("donation_date")
+        comments = request.form.get("comments")
+        has_error = False
         
+        # UCID: sb2648
+        # add-2 donor_firstname is required (flash proper error message)
+        if not donor_firstname:
+            flash("Donor First Name is required.", "danger")
+            has_error = True
+            
+        # UCID: sb2648
+        # add-3 donor_lastname is required (flash proper error message)
+        if not donor_lastname:
+            flash("Donor Last Name is required.", "danger")
+            has_error = True
         
-        # TODO add-2 donor_firstname is required (flash proper error message)
-        # TODO add-3 donor_lastname is required (flash proper error message)
-        # TODO add-4 donor_email is required (flash proper error message)
-        # TODO add-4a email must be in proper format (flash proper message)
-        # TODO add-5 organization_id is required (flash proper error message)
-        # TODO add-6 item_name is required (flash proper error message)
-        # TODO add-7 item_description is optional
-        # TODO add-8 item_quantity is required and must be more than 0 (flash proper error message)
-        # TODO add-9 donation_date is required and must be within the past 30 days
-        # TODO add-10 comments are optional
-        has_error = False # use this to control whether or not an insert occurs
+        # UCID: sb2648
+        # add-4 donor_email is required (flash proper error message)
+        if not donor_email:
+            flash("Donor Email is required.", "danger")
+            has_error = True
+        
+        # UCID: sb2648
+        #  add-4a email must be in proper format (flash proper message)
+        if donor_email and not is_valid_email(donor_email):
+            flash("Invalid email format.", "danger")
+            has_error = True
+        
+        # UCID: sb2648
+        # add-5 organization_id is required (flash proper error message)
+        if not organization_id:
+            flash("Organization ID is required.", "danger")
+            has_error = True
+            
+        # UCID: sb2648
+        #  add-6 item_name is required (flash proper error message)
+        if not item_name:
+            flash("Item Name is required.", "danger")
+            has_error = True
+        
+        # UCID: sb2648
+        # add-7 item_description is optional
+        if not item_description:
+            has_error = False
+        
+        # UCID: sb2648
+        #  add-8 item_quantity is required and must be more than 0 (flash proper error message)
+        if not item_quantity or int(item_quantity) <= 0:
+            flash("Item Quantity must be greater than 0.", "danger")
+            has_error = True
+        
+        # UCID: sb2648
+        # add-9 donation_date is required and must be within the past 30 days
+        if not donation_date or not is_valid_date(donation_date):
+            flash("Invalid or missing Donation Date.", "danger")
+            has_error = True
+        
+        # UCID: sb2648
+        # add-10 comments are optional
+        if not comments:
+            has_error = False # use this to control whether or not an insert occurs
         
         if not has_error:
             try:
                 result = DB.insertOne("""
-                INSERT INTO ...
-                """, ...
-                ) # <-- TODO add-11 add query and add arguments
+                INSERT INTO IS601_MP3_Donations (donor_firstname, donor_lastname, donor_email, organization_id, item_name, item_description, item_quantity, donation_date, comments)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """,  *(donor_firstname, donor_lastname, donor_email, organization_id, item_name, item_description, item_quantity, donation_date, comments)
+                )     # UCID: sb2648      # add-11 add query and add arguments
                 if result.status:
                     print("donation record created")
                     flash("Created Donation Record", "success")
             except Exception as e:
-                # TODO add-7 make message user friendly
+                # UCID: sb2648
+                # add-7 make message user friendly
                 print(f"insert error {e}")
-                flash(str(e), "danger")
+                flash("An error occurred while creating the donation record. Please try again later.", "danger")
+
     return render_template("manage_donation.html",donation=request.form)
+
+def is_valid_email(email):
+    # Basic email format validation using regular expression
+    email_pattern = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+    return bool(re.match(email_pattern, email))
+
+def is_valid_date(date_str):
+    try:
+        # Basic date format validation using datetime
+        date_format = "%Y-%m-%d"
+        date_obj = datetime.strptime(date_str, date_format)
+        
+        # Check if the date is within the past 30 days
+        thirty_days_ago = datetime.now() - timedelta(days=30)
+        return date_obj >= thirty_days_ago
+    except ValueError:
+        return False
 
 @donations.route("/edit", methods=["GET", "POST"])
 def edit():
