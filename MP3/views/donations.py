@@ -267,11 +267,31 @@ def edit():
 
 @donations.route("/delete", methods=["GET"])
 def delete():
-    # TODO delete-1 if id is missing, flash necessary message and redirect to search
-    # TODO delete-2 delete donation by id (fetch the id from the request)
-    # TODO delete-3 ensure a flash message shows for successful delete
-    # TODO delete-4 pass all argument except id to this route
-    # TODO delete-5 redirect to donation search
-    pass
-
-    # return redirect(url_for("donations.search", **args))
+    # sb2648
+    # delete-1 if id is missing, flash necessary message and redirect to search
+    donation_id = request.args.get('id')
+    if not donation_id:
+        flash("Missing donation ID. Unable to delete.", "error")
+        return redirect(url_for("donations.search"))
+    
+    # sb2648
+    # delete-2 delete donation by id (fetch the id from the request)
+    try:
+        query = "DELETE FROM IS601_MP3_Donations WHERE id = %s;"
+        result = DB.delete(query, donation_id)
+        
+        if result.status:
+            # sb2648
+            # delete-3 ensure a flash message shows for successful delete
+            flash("Donation successfully deleted.", "success")
+        else:
+            flash("Error deleting donation. Please try again.", "error")
+    except Exception as e:
+        flash(str(e), "error")
+    # sb2648
+    # delete-4 pass all argument except id to this route
+    args = request.args.copy()
+    args.pop('id', None)
+    # sb2648
+    # delete-5 redirect to donation search
+    return redirect(url_for("donations.search", **args))
