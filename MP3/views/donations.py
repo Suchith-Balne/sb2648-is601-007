@@ -3,47 +3,98 @@ from flask import Blueprint, redirect, render_template, request, flash, url_for
 from sql.db import DB
 donations = Blueprint('donations', __name__, url_prefix='/donations')
 
-
 @donations.route("/search", methods=["GET"])
 def search():
     rows = []
     organization_name = ""
     # DO NOT DELETE PROVIDED COMMENTS
-    # TODO search-1 retrieve donation id as id, donor_firstname, donor_lastname, donor_email, organization_id, item_name, item_description, item_quantity, donation_date, comments, organization_name using a LEFT JOIN
-    query = """SELECT ...
-     FROM ... LEFT JOIN ... WHERE 1=1"""
+    
+    # UCID: sb2648 
+    # search-1 retrieve donation id as id, donor_firstname, donor_lastname, donor_email, organization_id, item_name, item_description, item_quantity, donation_date, comments, organization_name using a LEFT JOIN
+    query = """select d.donor_firstname, d.donor_lastname, d.donor_email, O.name as organization_name ,d.item_name,d.item_description, d.item_quantity, d.created, d.modified , d.id, d.organization_id, d.donation_date, d.comments from IS601_MP3_Donations as d LEFT JOIN IS601_MP3_Organizations as O on d.organization_id=O.id WHERE 1=1"""
     args = {} # <--- add values to replace %s/%(named)s placeholders
     allowed_columns = ["donor_firstname", "donor_lastname", "donor_email", "organization_name" ,"item_name", "item_quantity", "created", "modified"]
-    # TODO search-2 get fn, ln, email, organization_id, column, order, limit from request args
-    # TODO search-3 append like filter for donor_firstname if provided
-    # TODO search-4 append like filter for donor_lastname if provided
-    # TODO search-5 append like filter for donor_email if provided
-    # TODO search-6 append like filter for item_name if provided
-    # TODO search-7 append equality filter for organization_id if provided
-    # TODO search-8 append sorting if column and order are provided and within the allowed columns and order options (asc, desc)
-    # TODO search-9 append limit (default 10) or limit greater than 1 and less than or equal to 100
-    # TODO search-10 provide a proper error message if limit isn't a number or if it's out of bounds
     
+    # UCID: sb2648 
+    # search-2 get fn, ln, email, organization_id, column, order, limit from request args
+    fn = request.args.get("first_name")
+    ln = request.args.get("last_name")
+    email = request.args.get("email")
+    organization_id = request.args.get("organization_id")
+    item_name = request.args.get("item_name")
+    column = request.args.get("column")
+    order = request.args.get("order")
+    limit = request.args.get("limit", 10)
     
-    limit = 10 # TODO change this per the above requirements
+    # UCID: sb2648 
+    # search-3 append like filter for donor_firstname if provided
+    if fn:
+        query += " AND donor_firstname LIKE %(donor_firstname)s"
+        args["donor_firstname"] = f"%{fn}%"
+        
+    # UCID: sb2648 
+    # search-4 append like filter for donor_lastname if provided
+    if ln:
+        query += " AND donor_lastname LIKE %(donor_lastname)s"
+        args["donor_lastname"] = f"%{ln}%"
+        
+    # UCID: sb2648 
+    # search-5 append like filter for donor_email if provided
+    if email:
+        query += " AND donor_email LIKE %(donor_email)s"
+        args["donor_email"] = f"%{email}%"
+        
+    # UCID: sb2648 
+    # search-6 append like filter for item_name if provided
+    if item_name:
+        query += " AND item_name LIKE %(item_name)s"
+        args["item_name"] = f"%{item_name}%"
     
-    query += " LIMIT %(limit)s"
-    args["limit"] = limit
+    # UCID: sb2648  
+    # search-7 append equality filter for organization_id if provided
+    if organization_id:
+        query += " AND organization_id = %(organization_id)s"
+        args["organization_id"] = organization_id
+        
+    # UCID: sb2648 
+    # search-8 append sorting if column and order are provided and within the allowed columns and order options (asc, desc)
+    if column and order and column in allowed_columns and order in ["asc", "desc"]:
+        query += f" ORDER BY {column} {order}"
+        
+    # UCID: sb2648 
+    # search-9 append limit (default 10) or limit greater than 1 and less than or equal to 100
+    # UCID: sb2648 
+    # search-10 provide a proper error message if limit isn't a number or if it's out of bounds
+    try:
+        if 1 <= int(limit) <= 100:
+            query += " LIMIT %(limit)s"
+            args["limit"] = limit
+        else:
+            raise ValueError("Limit must be a number between 1 and 100")
+    except ValueError as e:
+        flash(str(e), "danger")
+    
     #print("query",query)
     #print("args", args)
     try:
         result = DB.selectAll(query, args)
         if result.status:
             rows = result.rows
-            #print(f"rows: {rows}")
+            print(f"rows: {rows}")
     except Exception as e:
-        # TODO search-11 make message user friendly
-        flash(e, "error")
+        # search-11 make message user friendly
+        flash("DB error occured try modifying the search", "error")
     # hint: use allowed_columns in template to generate sort dropdown
     # hint2: convert allowed_columns into a list of tuples representing (value, label)
     # do this prior to passing to render_template, but not before otherwise it can break validation
+    allowed_columns = [(column, column.replace("_", " ").title()) for column in allowed_columns]
     
-    # TODO search-12 if request args has organization identifier set organization_name variable to the correct name
+    # search-12 if request args has organization identifier set organization_name variable to the correct name
+    organization_id = request.args.get("organization_id")
+    if organization_id:
+        organization_name_result = DB.selectOne("SELECT name FROM IS601_MP3_Organizations WHERE id = %(organization_id)s", {"organization_id": organization_id})
+        if organization_name_result.status:
+            organization_name = organization_name_result.row["name"]
     
     return render_template("list_donations.html", organization_name=organization_name, rows=rows, allowed_columns=allowed_columns)
 
@@ -52,6 +103,8 @@ def search():
 def add():
     if request.method == "POST":
         # TODO add-1 retrieve form data for donor_firstname, donor_lastname, donor_email, organization_id, item_name, item_description, item_quantity, donation_date, comments
+        
+        
         # TODO add-2 donor_firstname is required (flash proper error message)
         # TODO add-3 donor_lastname is required (flash proper error message)
         # TODO add-4 donor_email is required (flash proper error message)
@@ -64,7 +117,6 @@ def add():
         # TODO add-10 comments are optional
         has_error = False # use this to control whether or not an insert occurs
         
-       
         if not has_error:
             try:
                 result = DB.insertOne("""
