@@ -212,55 +212,116 @@ def is_valid_date(date_str):
 @donations.route("/edit", methods=["GET", "POST"])
 def edit():
     row = {}
-    
-    # TODO edit-1 request args id is required (flash proper error message)
-    id = False
-    if not id: # TODO update this for TODO edit-1
-        pass
+    # UCID: sb2648
+    # edit-1 request args id is required (flash proper error message)
+    donation_id = request.args.get('id')
+    if not donation_id: # update this for TODO edit-1
+        flash("ID is required", "danger")
     else:
         if request.method == "POST":
+            # sb2648
+            # add-2 retrieve form data for donor_firstname, donor_lastname, donor_email, organization_id, item_name, item_description, item_quantity, donation_date, comments
+            donor_firstname = request.form.get('donor_firstname')
+            donor_lastname = request.form.get('donor_lastname')
+            donor_email = request.form.get('donor_email')
+            organization_id = request.form.get('organization_id')
+            item_name = request.form.get('item_name')
+            item_description = request.form.get('item_description')
+            item_quantity = request.form.get('item_quantity')
+            donation_date = request.form.get('donation_date')
+            comments = request.form.get('comments')
             
-            # TODO add-2 retrieve form data for donor_firstname, donor_lastname, donor_email, organization_id, item_name, item_description, item_quantity, donation_date, comments
-            # TODO add-3 donor_firstname is required (flash proper error message)
-            # TODO add-4 donor_lastname is required (flash proper error message)
-            # TODO add-5 donor_email is required (flash proper error message)
-            # TODO add-5a email must be in proper format (flash proper message)
-            # TODO add-6 organization_id is required (flash proper error message)
-            # TODO add-7 item_name is required (flash proper error message)
-            # TODO add-8 item_description is optional
-            # TODO add-9 item_quantity is required and must be more than 0 (flash proper error message)
-            # TODO add-10 donation_date is required and must be within the past 30 days
-            # TODO add-11 comments are optional
+            # sb2648
+            # add-3 donor_firstname is required (flash proper error message)
+            if not donor_firstname:
+                flash("Donor First Name is required.", "error")
+                has_error = True
+            # sb2648
+            # add-4 donor_lastname is required (flash proper error message)
+            if not donor_lastname:
+                flash("Donor Last Name is required.", "error")
+                has_error = True
+            # sb2648
+            # add-5 donor_email is required (flash proper error message)
+            if not donor_email:
+                flash("Donor Email is required.", "error")
+                has_error = True
+            # sb2648
+            # add-5a email must be in proper format (flash proper message)
+            elif not is_valid_email(donor_email):
+                flash("Invalid email format.", "error")
+                has_error = True
+            # sb2648
+            # add-6 organization_id is required (flash proper error message)
+            if not organization_id:
+                flash("Organization ID is required.", "error")
+                has_error = True
+            # sb2648
+            # add-7 item_name is required (flash proper error message)
+            if not item_name:
+                flash("Item Name is required.", "error")
+                has_error = True
+            # sb2648
+            # add-8 item_description is optional
+            if not item_description:
+                has_error = False
+            # sb2648
+            # add-9 item_quantity is required and must be more than 0 (flash proper error message)
+            if not item_quantity or int(item_quantity) <= 0:
+                flash("Item Quantity must be greater than 0.", "error")
+                has_error = True
+            # sb2648
+            # add-10 donation_date is required and must be within the past 30 days
+            if not donation_date or not is_valid_date(donation_date):
+                flash("Invalid or missing donation date.", "error")
+                has_error = True
+            # sb2648
+            # add-11 comments are optional
+            if not comments:
+                has_error = False
             has_error = False # use this to control whether or not an insert occurs
                 
             if not has_error:
                 try:
-                    # TODO edit-12 fill in proper update query
+                    # edit-12 fill in proper update query
                     result = DB.update("""
-                    UPDATE ... SET
-                    ...
-                    """, ...)
+                    UPDATE IS601_MP3_Donations SET
+                        donor_firstname = %s,
+                        donor_lastname = %s,
+                        donor_email = %s,
+                        organization_id = %s,
+                        item_name = %s,
+                        item_description = %s,
+                        item_quantity = %s,
+                        donation_date = %s,
+                        comments = %s
+                    WHERE id = %s 
+                    """, *(donor_firstname, donor_lastname, donor_email,organization_id, item_name, item_description,item_quantity, donation_date, comments, donation_id))
                     
                     if result.status:
                         flash("Updated record", "success")
                 except Exception as e:
-                    # TODO edit-13 make this user-friendly
+                    # sb2648
+                    # edit-13 make this user-friendly
                     print(f"update error {e}")
                     flash(e, "danger")
         
         try:
-            # TODO edit-14 fetch the updated data 
+            # sb2648
+            # edit-14 fetch the updated data 
             result = DB.selectOne("""SELECT 
-            ...
-            FROM ... LEFT JOIN ... 
-              
-             WHERE ..."""
-            , id)
+            d.donor_firstname, d.donor_lastname, d.donor_email,d.organization_id, d.item_name, d.item_description,
+            d.item_quantity, d.donation_date, d.comments
+            FROM IS601_MP3_Donations AS d
+            LEFT JOIN IS601_MP3_Organizations AS o ON d.organization_id = o.id
+            WHERE d.id = %s"""
+            , donation_id)
             
             if result.status:
                 row = result.row
         except Exception as e:
-            # TODO edit-15 make this user-friendly
+            # sb2648
+            # edit-15 make this user-friendly
             flash(str(e), "danger")
     
     return render_template("manage_donation.html", donation=row)
@@ -271,7 +332,7 @@ def delete():
     # delete-1 if id is missing, flash necessary message and redirect to search
     donation_id = request.args.get('id')
     if not donation_id:
-        flash("Missing donation ID. Unable to delete.", "error")
+        flash("Missing donation ID. Unable to delete.", "danger")
         return redirect(url_for("donations.search"))
     
     # sb2648
