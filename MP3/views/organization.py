@@ -89,8 +89,6 @@ def add():
         zipcode = request.form.get("zip")
         website = request.form.get("website")
         description = request.form.get("description")
-        print(country)
-        print(state)
         # sb2648
         #  add-2 name is required (flash proper error message)
         if not name:
@@ -226,11 +224,34 @@ def edit():
 
 @organization.route("/delete", methods=["GET"])
 def delete():
-    # TODO delete-1 if id is missing, flash necessary message and redirect to search
-    # TODO delete-2 delete organization by id (note: you'll likely need to trigger a delete of all donations related to this organization first due to foreign key constraints)
-    # TODO delete-3 ensure a flash message shows for successful delete
-    # TODO delete-4 pass all argument except id to this route
-    # TODO delete-5 redirect to organization search
-    pass
-   
-    #return redirect(url_for("organization.search", **args))
+    # sb2648
+    # delete-1 if id is missing, flash necessary message and redirect to search
+    org_id = request.args.get("id")
+    if not org_id:
+        flash("Organization ID is missing. Unable to delete.", "error")
+        return redirect(url_for("organization.search"))
+    # sb2648
+    # delete-2 delete organization by id (note: you'll likely need to trigger a delete of all donations related to this organization first due to foreign key constraints)
+    try:
+        query_delete_donations = "DELETE FROM IS601_MP3_Donations WHERE organization_id = %s;"
+        result = DB.delete(query_delete_donations, org_id)
+        
+        query_delete_organizations = "DELETE FROM IS601_MP3_Organizations WHERE id = %s;"
+        result = DB.delete(query_delete_organizations, org_id)
+        
+        if result.status:
+            # sb2648
+            # delete-3 ensure a flash message shows for successful delete
+            flash("Donation successfully deleted.", "success")
+        else:
+            flash("Error deleting donation. Please try again.", "error")
+    except Exception as e:
+        flash(str(e), "danger")
+    # sb2648
+    # delete-4 pass all argument except id to this route
+    args = request.args.copy()
+    args.pop('id', None)
+    
+    # sb2648
+    # delete-5 redirect to organization search
+    return redirect(url_for("organization.search", **args))
