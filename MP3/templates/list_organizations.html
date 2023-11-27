@@ -16,19 +16,28 @@
             ensure all fields prefill with request arg data if provided
             #}
             <!--name filter-->
-
+            <div class="col-auto">
+                <label class="form-label" for="name">Name</label>
+                <input type="text" name="name" class="form-control" id="name" placeholder="Name"
+                    value="{{request.args.get('name') or ''}}">
+            </div>
             <!-- country state filter-->
             {{country_state_selector(layout="horizontal")}}
             <!-- sort filter -->
-            {# TODO pass/set the columns that can be used for sort/filter (i.e. allowed_columns) #}
-            {{sort_filter(cols=[])}}
+            {# sb2648 #}
+            {# pass/set the columns that can be used for sort/filter (i.e. allowed_columns) #}
+            {{sort_filter(cols = allowed_columns)}}
             <!--limit filter-->
-
-            <div class="col">
-                <input type="submit" class="btn btn-primary" value="Filter" />
+            <div class="col-auto">
+                <label class="form-label" for="limit">Limit</label>
+                <input type="number" name="limit" class="form-control" id="limit" value="{{ request.args.get('limit', 10) }}">
             </div>
-            <div class="col">
-                <a href="?" class="btn btn-secondary">Reset</a>
+
+            <div class="col-auto">
+                <input type="submit" class="btn btn-primary form-control mt-4" value="Filter" />
+            </div>
+            <div class="col-auto">
+                <a href="?" class="btn btn-secondary form-control mt-4">Reset</a>
             </div>
         </div>
     </form>
@@ -36,17 +45,23 @@
         <table class="table">
             {% if rows and rows|length > 0 %}
             <thead>
-                <tr class="text-capitalize">
+                <tr>
+                    {# sb2648 #}
                     {# generate th tags for each column to display #}
                     {# don't show any id or organization_id columns #}
                     {# IMPORTANT use table column names as the headings, replace _ with space via filter #}
                     <!-- add th elements -->
-
+                    {% for column in allowed_columns %}
+                        {% if column[0] not in ['id', 'organization_id'] %}
+                            <th class="text-capitalize">{{ column[1]|replace("_", " ") }}</th>
+                        {% endif %}
+                    {% endfor %}
                     <!-- keep this -->
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
+                {# sb2648 #}
                 {# generate tr with td tags for each piece of data #}
                 {# don't show any id or organization_id columns #}
                 {# if the td is for website, display it as a link where the text is "website" and the url is the
@@ -58,6 +73,26 @@
                 a delete button that passes the organization id and the request args to the organization delete route
                 #}
                 <!-- iterate over rows and generate proper tr and td elements with the data -->
+                {% for row in rows %}
+                    <tr>
+                        {% for column in allowed_columns %}
+                            {% if column[0] not in ['id', 'organization_id'] %}
+                                <td>
+                                    {% if column[0] == 'website' %}
+                                        <a href="{{ row[column[0]] }}" target="_blank">website</a>
+                                    {% else %}
+                                        {{ row[column[0]] }}
+                                    {% endif %}
+                                </td>
+                            {% endif %}
+                        {% endfor %}
+                        <td>
+                            <a href="{{ url_for('donations.search', organization_id=row['id']) }}" class="btn btn-info btn-sm m-1">View</a>
+                            <a href="{{ url_for('organization.edit', id=row['id']) }}" class="btn btn-warning btn-sm m-1">Edit</a>
+                            <a href="{{ url_for('organization.delete', id=row['id'], **request.args) }}" class="btn btn-danger btn-sm m-1">Delete</a>
+                        </td>
+                    </tr>
+                {% endfor %}
 
             </tbody>
             {% else %}
