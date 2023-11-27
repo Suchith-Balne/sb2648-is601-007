@@ -82,15 +82,16 @@ def importCSV():
                     # importcsv-4: extract donation data and append to donation list
                     # as a dict only with donation data if all donation fields are present (refer to above SQL)
                     if all(key in row for key in ['donor_name', 'donor_email', 'item_name', 'item_description', 'item_quantity', 'donation_date', 'comments', 'organization_name']):
+                        date_format = "%Y-%m-%d"
                         donations.append({
                             "donor_firstname": row["donor_name"].split()[0] if row["donor_name"] else '',
                             "donor_lastname": row["donor_name"].split()[1] if len(row["donor_name"].split()) > 1 else '',
                             "donor_email": row["donor_email"],
                             "item_name": row["item_name"],
-                            "quantity": row["item_quantity"],
+                            "quantity": int(row["item_quantity"]) if row["item_quantity"] and row["item_quantity"].isdigit() else 0,
                             "item_description": row["item_description"],
                             "organization_name": row["organization_name"],
-                            "donation_date": row["donation_date"],
+                            "donation_date": row["donation_date"] if row["donation_date"] else None,
                             "comments": row["comments"]
                         })
                     
@@ -103,7 +104,7 @@ def importCSV():
                         flash(f"Inserted or updated {len(organizations)} organizations", "success")
                     except Exception as e:
                         traceback.print_exc()
-                        flash("There was an error loading in the csv data", "danger")
+                        flash(f"There was an error loading in organizations csv data as {e}", "danger")
                 else:
                     # importcsv-6 display flash message (info) that no organizations were loaded
                     # UCID: sb2648, Date: 11/25/2023
@@ -117,7 +118,7 @@ def importCSV():
                         flash(f"Inserted or updated {len(donations)} donations", "success")
                     except Exception as e:
                         traceback.print_exc()
-                        flash("There was an error loading in the csv data", "danger")
+                        flash(f"There was an error loading in donations csv data as {e}", "danger")
                 else:
                     # importcsv-8 display flash message (info) that no donations were loaded
                     # UCID: sb2648, Date: 11/25/2023
@@ -127,7 +128,7 @@ def importCSV():
                     print(f"Result {result}")
                 except Exception as e:
                         traceback.print_exc()
-                        flash("There was an error counting session queries", "danger")
+                        flash(f"There was an error counting session queries due to {e}", "error")
             else:
                 flash("Only csv files are allowed", "danger")
     return render_template("upload.html")

@@ -14,12 +14,12 @@ def search():
     # search-1 retrieve donation id as id, donor_firstname, donor_lastname, donor_email, organization_id, item_name, item_description, item_quantity, donation_date, comments, organization_name using a LEFT JOIN
     query = """select d.donor_firstname, d.donor_lastname, d.donor_email, O.name as organization_name ,d.item_name,d.item_description, d.item_quantity, d.created, d.modified , d.id, d.organization_id, d.donation_date, d.comments from IS601_MP3_Donations as d LEFT JOIN IS601_MP3_Organizations as O on d.organization_id=O.id WHERE 1=1"""
     args = {} # <--- add values to replace %s/%(named)s placeholders
-    allowed_columns = ["donor_firstname", "donor_lastname", "donor_email", "organization_name" ,"item_name", "item_quantity", "created", "modified"]
+    allowed_columns = ["donor_firstname", "donor_lastname", "donor_email" ,"item_name", "item_quantity", "donation_date", "comments", "organization_name"]
     
     # UCID: sb2648 
     # search-2 get fn, ln, email, organization_id, column, order, limit from request args
-    fn = request.args.get("first_name")
-    ln = request.args.get("last_name")
+    fn = request.args.get("fn")
+    ln = request.args.get("ln")
     email = request.args.get("email")
     organization_id = request.args.get("organization_id")
     item_name = request.args.get("item_name")

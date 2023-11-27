@@ -176,7 +176,8 @@ def edit():
         return redirect(url_for("organization.search"))
     else:
         if request.method == "POST":
-            #data = {"id": org_id} # use this as needed, can convert to tuple if necessary
+            data = {"id": org_id} # use this as needed, can convert to tuple if necessary
+            
             # sb2648
             # edit-2 retrieve form data for name, address, city, state, country, zip, website
             name = request.form.get("name")
@@ -186,6 +187,7 @@ def edit():
             country = request.form.get("country")
             zip_code = request.form.get("zip")
             website = request.form.get("website")
+            description = request.form.get("description")
             # sb2648
             has_error = False
             # edit-3 name is required (flash proper error message)
@@ -252,9 +254,10 @@ def edit():
                         state = %s,
                         country = %s,
                         zip = %s,
-                        website = %s
+                        website = %s,
+                        description = %s
                     WHERE id = %s;
-                    """, *(name,address,city,state,country,zip_code,website,org_id))
+                    """, *(name,address,city,state,country,zip_code,website, description,data["id"]))
                     
                     if result.status:
                         print("updated record")

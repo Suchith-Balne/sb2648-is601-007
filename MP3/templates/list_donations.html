@@ -24,14 +24,14 @@
             <!--first name-->
             <div class="col-auto">
                 <label class="form-label" for="first_name">First Name</label>
-                <input type="text" name="first_name" class="form-control" id="first_name" placeholder="First Name"
-                    value="{{request.args.get('first_name') or ''}}">
+                <input type="text" name="fn" class="form-control" id="first_name" placeholder="First Name"
+                    value="{{request.args.get('fn') or ''}}">
             </div>
             <!-- UCID: sb2648 -->
             <!--last name-->
             <div class="col-auto">
                 <label for="last_name">Last Name</label>
-                <input type="text" name="last_name" class="form-control" id="last_name" placeholder="Last Name" value="{{ request.args.get('last_name') or ''}}">
+                <input type="text" name="ln" class="form-control" id="last_name" placeholder="Last Name" value="{{ request.args.get('ln') or ''}}">
             </div>
             <!-- UCID: sb2648 -->
             <!--email-->
@@ -102,11 +102,11 @@
                     <td>{{ row['donor_firstname'] }}</td>
                     <td>{{ row['donor_lastname'] }}</td>
                     <td>{{ row['donor_email'] }}</td>
-                    <td>{{ row['organization_name'] }}</td>
                     <td>{{ row['item_name'] }}</td>
                     <td>{{ row['item_quantity'] }}</td>
-                    <td>{{ row['created'] }}</td>
-                    <td>{{ row['modified'] }}</td>
+                    <td>{{ row['donation_date'] }}</td>
+                    <td>{{ row['comments'] }}</td>
+                    <td>{{ row['organization_name'] }}</td>
                     <td>
                         <a href="{{ url_for('donations.edit', id=row['id']) }}" class="btn btn-primary m-1">Edit</a>
                         <a href="{{ url_for('donations.delete', id=row['id']) }}" class="btn btn-danger m-1"> Del </a>
