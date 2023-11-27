@@ -147,7 +147,6 @@ def add():
         # UCID: sb2648 11/26/2023
         # add-9 description is not required
         if not description:
-            flash("Description is required.", "danger")
             has_error = False
 
         if not has_error:
