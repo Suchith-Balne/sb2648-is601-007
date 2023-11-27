@@ -66,7 +66,7 @@ def search():
         # sb2648
         # search-9 make message user friendly
         #flash(str(e), "danger")
-        flash("DB error occured try modifying the search", "danger")
+        flash("DB error occured try modifying the search", "error")
     # hint: use allowed_columns in template to generate sort dropdown
     # hint2: convert allowed_columns into a list of tuples representing (value, label)
     allowed_columns = [(column, column.replace("_", " ").title()) for column in allowed_columns]
@@ -158,67 +158,125 @@ def add():
                 """, *(name, address, city, state, country, zipcode, website, description)) 
                 # sb2648
                 # add-10 add query and add arguments
-                
                 if result.status:
                     flash("Added Organization", "success")
             except Exception as e:
-                # TODO add-11 make message user friendly
-                flash(str(e), "danger")
+                # add-11 make message user friendly
+                flash("Error Occured:" + str(e), "error")
         
     return render_template("manage_organization.html", org=request.form)
 
 @organization.route("/edit", methods=["GET", "POST"])
 def edit():
-    # TODO edit-1 request args id is required (flash proper error message)
-    id = False
-    if not id: # TODO update this for TODO edit-1
-        pass
+    # sb2648
+    # edit-1 request args id is required (flash proper error message)
+    org_id = request.args.get("id")
+    if not org_id:
+        flash("Organization ID is required.", "error")
+        return redirect(url_for("organization.search"))
     else:
         if request.method == "POST":
-            data = {"id": id} # use this as needed, can convert to tuple if necessary
-            # TODO edit-2 retrieve form data for name, address, city, state, country, zip, website
-            # TODO edit-3 name is required (flash proper error message)
-            # TODO edit-4 address is required (flash proper error message)
-            # TODO edit-5 city is required (flash proper error message)
-            # TODO edit-6 state is required (flash proper error message)
-            # TODO edit-6a state should be a valid state mentioned in pycountry for the selected state
+            #data = {"id": org_id} # use this as needed, can convert to tuple if necessary
+            # sb2648
+            # edit-2 retrieve form data for name, address, city, state, country, zip, website
+            name = request.form.get("name")
+            address = request.form.get("address")
+            city = request.form.get("city")
+            state = request.form.get("state")
+            country = request.form.get("country")
+            zip_code = request.form.get("zip")
+            website = request.form.get("website")
+            # sb2648
+            has_error = False
+            # edit-3 name is required (flash proper error message)
+            if not name:
+                has_error = True
+                flash("Name is required.", "danger")
+            # sb2648
+            #  edit-4 address is required (flash proper error message)
+            if not address:
+                has_error = True
+                flash("Address is required.", "danger")
+            # sb2648
+            #  edit-5 city is required (flash proper error message)
+            if not city:
+                has_error = True
+                flash("City is required.", "danger")
+            # sb2648
+            #  edit-6 state is required (flash proper error message)
+            if not state:
+                has_error = True
+                flash("State is required.", "danger")
+            # sb2648
+            #  edit-6a state should be a valid state mentioned in pycountry for the selected state
             # hint see geography.py and pycountry documentation
-            # TODO edit-7 country is required (flash proper error message)
-            # TODO edit-7a country should be a valid country mentioned in pycountry
+            valid_states = [subdivision.code.split('-')[1] for subdivision in pycountry.subdivisions.get(country_code=country)]
+            if state and state not in valid_states:
+                flash("Invalid state selected.", "danger")
+            # sb2648
+            #  edit-7 country is required (flash proper error message)
+            if not country:
+                has_error = True
+                flash("Country is required.", "danger")
+            # sb2648
+            #  edit-7a country should be a valid country mentioned in pycountry
             # hint see geography.py and pycountry documentation
-            # TODO edit-8 website is not required
-            # TODO edit-9 zipcode is required (flash proper error message)
+            valid_countries = [country.alpha_2 for country in pycountry.countries]
+            if country and country not in valid_countries:
+                has_error = True
+                flash("Invalid country selected.", "danger")
+            # sb2648
+            #  edit-8 website is not required
+            if not website:
+                has_error = False
+            # sb2648
+            #  edit-9 zipcode is required (flash proper error message)
             # note: call zip variable zipcode as zip is a built in function it could lead to issues
+            if not zip_code:
+                has_error = True
+                flash("Zipcode is required.", "danger")
             # populate data dict with mappings
-            has_error = False # use this to control whether or not an insert occurs
+            #has_error = False # use this to control whether or not an insert occurs
 
             if not has_error:
                 try:
-                    # TODO edit-10 fill in proper update query
+                    # sb2648
+                    #  edit-10 fill in proper update query
                     # name, address, city, state, country, zip, website
                     result = DB.update("""
-                    UPDATE ...
+                    UPDATE IS601_MP3_Organizations
                     SET
-                    ...
-                    """, data)
+                        name = %s,
+                        address = %s,
+                        city = %s,
+                        state = %s,
+                        country = %s,
+                        zip = %s,
+                        website = %s
+                    WHERE id = %s;
+                    """, *(name,address,city,state,country,zip_code,website,org_id))
                     
                     if result.status:
                         print("updated record")
                         flash("Updated record", "success")
                 except Exception as e:
-                    # TODO edit-11 make this user-friendly
+                    # sb2648
+                    # edit-11 make this user-friendly
                     print(f"{e}")
-                    flash(str(e), "danger")
+                    flash("Error updating record. Please try again.", "danger")
+
         row = {}
         try:
-            # TODO edit-12 fetch the updated data
-            result = DB.selectOne("SELECT ... FROM ... WHERE ...", id)
+            # sb2648
+            #  edit-12 fetch the updated data
+            result = DB.selectOne("SELECT name,description, address, website,city, state, country, zip  FROM IS601_MP3_Organizations WHERE id = %s", org_id)
             if result.status:
                 row = result.row
                 
         except Exception as e:
-            # TODO edit-13 make this user-friendly
-            flash(str(e), "danger")
+            # sb2648
+            #  edit-13 make this user-friendly
+            flash("Error fetching data. Please try again.", "danger")
     
     return render_template("manage_organization.html", org=row)
 

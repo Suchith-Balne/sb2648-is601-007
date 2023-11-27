@@ -220,7 +220,7 @@ def edit():
     else:
         if request.method == "POST":
             # sb2648
-            # add-2 retrieve form data for donor_firstname, donor_lastname, donor_email, organization_id, item_name, item_description, item_quantity, donation_date, comments
+            # edit-2 retrieve form data for donor_firstname, donor_lastname, donor_email, organization_id, item_name, item_description, item_quantity, donation_date, comments
             donor_firstname = request.form.get('donor_firstname')
             donor_lastname = request.form.get('donor_lastname')
             donor_email = request.form.get('donor_email')
@@ -232,51 +232,51 @@ def edit():
             comments = request.form.get('comments')
             
             # sb2648
-            # add-3 donor_firstname is required (flash proper error message)
+            # edit-3 donor_firstname is required (flash proper error message)
             if not donor_firstname:
                 flash("Donor First Name is required.", "error")
                 has_error = True
             # sb2648
-            # add-4 donor_lastname is required (flash proper error message)
+            # edit-4 donor_lastname is required (flash proper error message)
             if not donor_lastname:
                 flash("Donor Last Name is required.", "error")
                 has_error = True
             # sb2648
-            # add-5 donor_email is required (flash proper error message)
+            # edit-5 donor_email is required (flash proper error message)
             if not donor_email:
                 flash("Donor Email is required.", "error")
                 has_error = True
             # sb2648
-            # add-5a email must be in proper format (flash proper message)
+            # edit-5a email must be in proper format (flash proper message)
             elif not is_valid_email(donor_email):
                 flash("Invalid email format.", "error")
                 has_error = True
             # sb2648
-            # add-6 organization_id is required (flash proper error message)
+            # edit-6 organization_id is required (flash proper error message)
             if not organization_id:
                 flash("Organization ID is required.", "error")
                 has_error = True
             # sb2648
-            # add-7 item_name is required (flash proper error message)
+            # edit-7 item_name is required (flash proper error message)
             if not item_name:
                 flash("Item Name is required.", "error")
                 has_error = True
             # sb2648
-            # add-8 item_description is optional
+            # edit-8 item_description is optional
             if not item_description:
                 has_error = False
             # sb2648
-            # add-9 item_quantity is required and must be more than 0 (flash proper error message)
+            # edit-9 item_quantity is required and must be more than 0 (flash proper error message)
             if not item_quantity or int(item_quantity) <= 0:
                 flash("Item Quantity must be greater than 0.", "error")
                 has_error = True
             # sb2648
-            # add-10 donation_date is required and must be within the past 30 days
+            # edit-10 donation_date is required and must be within the past 30 days
             if not donation_date or not is_valid_date(donation_date):
                 flash("Invalid or missing donation date.", "error")
                 has_error = True
             # sb2648
-            # add-11 comments are optional
+            # edit-11 comments are optional
             if not comments:
                 has_error = False
             has_error = False # use this to control whether or not an insert occurs

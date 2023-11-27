@@ -25,42 +25,42 @@ Donation{% endblock %}
             <!--donor first name-->
             <div class="form-group">
                 <label for="donor_firstname">Donor First Name:</label>
-                <input type="text" class="form-control" name="donor_firstname" id="donor_firstname" required>
+                <input type="text" class="form-control" name="donor_firstname" id="donor_firstname" value="{{ donation.donor_firstname }}"required>
             </div>
             <!--donor last name-->
             <div class="form-group">
                 <label for="donor_lastname">Donor Last Name:</label>
-                <input type="text" class="form-control" name="donor_lastname" id="donor_lastname" required>
+                <input type="text" class="form-control" name="donor_lastname" id="donor_lastname" value="{{ donation.donor_lastname }}"" required>
             </div>
             <!--donor email-->
             <div class="form-group">
                 <label for="donor_email">Donor Email:</label>
-                <input type="email" class="form-control" name="donor_email" id="donor_email" required>
+                <input type="email" class="form-control" name="donor_email" id="donor_email" value="{{ donation.donor_email }}" required>
             </div>
             <!--item name-->
             <div class="form-group">
                 <label for="item_name">Item Name:</label>
-                <input type="text" class="form-control" name="item_name" id="item_name" required>
+                <input type="text" class="form-control" name="item_name" id="item_name" value="{{ donation.item_name }}" required>
             </div>
             <!--item_description -->
             <div class="form-group">
                 <label for="item_description">Item Description:</label>
-                <input type="text" class="form-control" name="item_description" id="item_description">
+                <input type="text" class="form-control" name="item_description" value="{{ donation.item_description }}" id="item_description">
             </div>
             <!--item_quantity-->
             <div class="form-group">
                 <label for="item_quantity">Item Quantity:</label>
-                <input type="number" class="form-control" name="item_quantity" id="item_quantity" required>
+                <input type="number" class="form-control" name="item_quantity" id="item_quantity" value="{{ donation.item_quantity }}" required>
             </div>
             <!--donation date-->
             <div class="form-group">
                 <label for="donation_date">Donation Date:</label>
-                <input type="date" class="form-control" name="donation_date" id="donation_date" required>
+                <input type="date" class="form-control" name="donation_date" id="donation_date"  value="{{ donation.donation_date }}" required>
             </div>
 
             <div class="form-group">
                 <label for="comments">Comments:</label>
-                <textarea class="form-control" name="comments" id="comments"></textarea>
+                <textarea class="form-control" name="comments" id="comments" value="{{ donation.comments }}"></textarea>
             </div>
             <!-- organization selection-->
             {# use the below for organization selection #}
