@@ -20,42 +20,42 @@
             ensure all fields prefill with request arg data if provided
             #}
 
-            <!-- UCID: sb2648 -->
+            <!-- UCID: sb2648 11/26/2023 -->
             <!--first name-->
             <div class="col-auto">
                 <label class="form-label" for="first_name">First Name</label>
                 <input type="text" name="fn" class="form-control" id="first_name" placeholder="First Name"
                     value="{{request.args.get('fn') or ''}}">
             </div>
-            <!-- UCID: sb2648 -->
+            <!-- UCID: sb2648 11/26/2023 -->
             <!--last name-->
             <div class="col-auto">
                 <label for="last_name">Last Name</label>
                 <input type="text" name="ln" class="form-control" id="last_name" placeholder="Last Name" value="{{ request.args.get('ln') or ''}}">
             </div>
-            <!-- UCID: sb2648 -->
+            <!-- UCID: sb2648 11/26/2023 -->
             <!--email-->
             <div class="col-auto">
                 <label for="email">Email</label>
                 <input type="text" name="email" class="form-control" id="email" placeholder="Email" value="{{ request.args.get('email') or ''}}">
             </div>
-            <!-- UCID: sb2648 -->
+            <!-- UCID: sb2648 11/26/2023 -->
             <!-- item name-->
             <div class="col-auto">
                 <label for="item_name">Item Name</label>
                 <input type="text" name="item_name" class="form-control" id="item_name" placeholder="Item Name" value="{{ request.args.get('item_name') or ''}}">
             </div>
-            <!-- UCID: sb2648 -->
+            <!-- UCID: sb2648 11/26/2023 -->
             <!--organization-->
             <div class="col-auto">
                 <label class="visually-hidden" for="organization">Organization</label>
                 {{organization_dropdown(request.args.get("organization"))}}
             </div>
             <!-- sort filter -->
-            <!-- UCID: sb2648 -->
+            <!-- UCID: sb2648 11/26/2023 -->
             {# pass/set the columns that can be used for sort/filter (i.e. allowed_columns) #}
             {{sort_filter(cols=allowed_columns)}}
-            <!-- UCID: sb2648 -->
+            <!-- UCID: sb2648 11/26/2023 -->
             <!--limit filter-->
             <div class="col-auto">
                 <label class="form-label" for="limit">Limit</label>
@@ -74,7 +74,7 @@
         {% if rows and rows|length > 0 %}
         <thead>
             <tr class="text-capitalize">
-                <!-- UCID: sb2648 -->
+                <!-- UCID: sb2648 11/26/2023 -->
                 {# generate th tags for each column to display #}
                 {# don't show any id or organization_id columns #}
                 {# IMPORTANT use table column names as the headings, replace _ with space via filter #}
@@ -91,7 +91,7 @@
         <tbody>
             {# generate tr with td tags for each piece of data #}
             {# don't show any id or organization_id columns #}
-            <!-- UCID: sb2648 -->
+            <!-- UCID: sb2648 11/26/2023 -->
             {# in the last column add the following
             an edit button that passes the donation id to donation edit
             a delete button that passes the donation id and the request args to the donation delete route

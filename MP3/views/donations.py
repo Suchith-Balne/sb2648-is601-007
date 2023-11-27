@@ -10,13 +10,13 @@ def search():
     organization_name = ""
     # DO NOT DELETE PROVIDED COMMENTS
     
-    # UCID: sb2648 
+    # UCID: sb2648 11/26/2023 
     # search-1 retrieve donation id as id, donor_firstname, donor_lastname, donor_email, organization_id, item_name, item_description, item_quantity, donation_date, comments, organization_name using a LEFT JOIN
     query = """select d.donor_firstname, d.donor_lastname, d.donor_email, O.name as organization_name ,d.item_name,d.item_description, d.item_quantity, d.created, d.modified , d.id, d.organization_id, d.donation_date, d.comments from IS601_MP3_Donations as d LEFT JOIN IS601_MP3_Organizations as O on d.organization_id=O.id WHERE 1=1"""
     args = {} # <--- add values to replace %s/%(named)s placeholders
     allowed_columns = ["donor_firstname", "donor_lastname", "donor_email" ,"item_name", "item_quantity", "donation_date", "comments", "organization_name"]
     
-    # UCID: sb2648 
+    # UCID: sb2648 11/26/2023 
     # search-2 get fn, ln, email, organization_id, column, order, limit from request args
     fn = request.args.get("fn")
     ln = request.args.get("ln")
@@ -27,44 +27,44 @@ def search():
     order = request.args.get("order")
     limit = request.args.get("limit", 10)
     
-    # UCID: sb2648 
+    # UCID: sb2648 11/26/2023 
     # search-3 append like filter for donor_firstname if provided
     if fn:
         query += " AND donor_firstname LIKE %(donor_firstname)s"
         args["donor_firstname"] = f"%{fn}%"
         
-    # UCID: sb2648 
+    # UCID: sb2648 11/26/2023 
     # search-4 append like filter for donor_lastname if provided
     if ln:
         query += " AND donor_lastname LIKE %(donor_lastname)s"
         args["donor_lastname"] = f"%{ln}%"
         
-    # UCID: sb2648 
+    # UCID: sb2648 11/26/2023 
     # search-5 append like filter for donor_email if provided
     if email:
         query += " AND donor_email LIKE %(donor_email)s"
         args["donor_email"] = f"%{email}%"
         
-    # UCID: sb2648 
+    # UCID: sb2648 11/26/2023 
     # search-6 append like filter for item_name if provided
     if item_name:
         query += " AND item_name LIKE %(item_name)s"
         args["item_name"] = f"%{item_name}%"
     
-    # UCID: sb2648  
+    # UCID: sb2648 11/26/2023  
     # search-7 append equality filter for organization_id if provided
     if organization_id:
         query += " AND organization_id = %(organization_id)s"
         args["organization_id"] = organization_id
         
-    # UCID: sb2648 
+    # UCID: sb2648 11/26/2023 
     # search-8 append sorting if column and order are provided and within the allowed columns and order options (asc, desc)
     if column and order and column in allowed_columns and order in ["asc", "desc"]:
         query += f" ORDER BY {column} {order}"
         
-    # UCID: sb2648 
+    # UCID: sb2648 11/26/2023 
     # search-9 append limit (default 10) or limit greater than 1 and less than or equal to 100
-    # UCID: sb2648 
+    # UCID: sb2648 11/26/2023 
     # search-10 provide a proper error message if limit isn't a number or if it's out of bounds
     try:
         if 1 <= int(limit) <= 100:
@@ -103,7 +103,7 @@ def search():
 @donations.route("/add", methods=["GET","POST"])
 def add():
     if request.method == "POST":
-        # UCID: sb2648
+        # UCID: sb2648 11/26/2023
         # add-1 retrieve form data for donor_firstname, donor_lastname, donor_email, organization_id, item_name, item_description, item_quantity, donation_date, comments
         donor_firstname = request.form.get("donor_firstname")
         donor_lastname = request.form.get("donor_lastname")
@@ -116,60 +116,60 @@ def add():
         comments = request.form.get("comments")
         has_error = False
         
-        # UCID: sb2648
+        # UCID: sb2648 11/26/2023
         # add-2 donor_firstname is required (flash proper error message)
         if not donor_firstname:
             flash("Donor First Name is required.", "danger")
             has_error = True
             
-        # UCID: sb2648
+        # UCID: sb2648 11/26/2023
         # add-3 donor_lastname is required (flash proper error message)
         if not donor_lastname:
             flash("Donor Last Name is required.", "danger")
             has_error = True
         
-        # UCID: sb2648
+        # UCID: sb2648 11/26/2023
         # add-4 donor_email is required (flash proper error message)
         if not donor_email:
             flash("Donor Email is required.", "danger")
             has_error = True
         
-        # UCID: sb2648
+        # UCID: sb2648 11/26/2023
         #  add-4a email must be in proper format (flash proper message)
         if donor_email and not is_valid_email(donor_email):
             flash("Invalid email format.", "danger")
             has_error = True
         
-        # UCID: sb2648
+        # UCID: sb2648 11/26/2023
         # add-5 organization_id is required (flash proper error message)
         if not organization_id:
             flash("Organization ID is required.", "danger")
             has_error = True
             
-        # UCID: sb2648
+        # UCID: sb2648 11/26/2023
         #  add-6 item_name is required (flash proper error message)
         if not item_name:
             flash("Item Name is required.", "danger")
             has_error = True
         
-        # UCID: sb2648
+        # UCID: sb2648 11/26/2023
         # add-7 item_description is optional
         if not item_description:
             has_error = False
         
-        # UCID: sb2648
+        # UCID: sb2648 11/26/2023
         #  add-8 item_quantity is required and must be more than 0 (flash proper error message)
         if not item_quantity or int(item_quantity) <= 0:
             flash("Item Quantity must be greater than 0.", "danger")
             has_error = True
         
-        # UCID: sb2648
+        # UCID: sb2648 11/26/2023
         # add-9 donation_date is required and must be within the past 30 days
         if not donation_date or not is_valid_date(donation_date):
             flash("Invalid or missing Donation Date.", "danger")
             has_error = True
         
-        # UCID: sb2648
+        # UCID: sb2648 11/26/2023
         # add-10 comments are optional
         if not comments:
             has_error = False # use this to control whether or not an insert occurs
@@ -180,12 +180,12 @@ def add():
                 INSERT INTO IS601_MP3_Donations (donor_firstname, donor_lastname, donor_email, organization_id, item_name, item_description, item_quantity, donation_date, comments)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """,  *(donor_firstname, donor_lastname, donor_email, organization_id, item_name, item_description, item_quantity, donation_date, comments)
-                )     # UCID: sb2648      # add-11 add query and add arguments
+                )     # UCID: sb2648 11/26/2023      # add-11 add query and add arguments
                 if result.status:
                     print("donation record created")
                     flash("Created Donation Record", "success")
             except Exception as e:
-                # UCID: sb2648
+                # UCID: sb2648 11/26/2023
                 # add-7 make message user friendly
                 print(f"insert error {e}")
                 flash("An error occurred while creating the donation record. Please try again later.", "danger")
@@ -212,14 +212,14 @@ def is_valid_date(date_str):
 @donations.route("/edit", methods=["GET", "POST"])
 def edit():
     row = {}
-    # UCID: sb2648
+    # UCID: sb2648 11/26/2023 11/26/2023
     # edit-1 request args id is required (flash proper error message)
     donation_id = request.args.get('id')
     if not donation_id: # update this for TODO edit-1
         flash("ID is required", "danger")
     else:
         if request.method == "POST":
-            # sb2648
+            # sb2648 11/26/2023
             # edit-2 retrieve form data for donor_firstname, donor_lastname, donor_email, organization_id, item_name, item_description, item_quantity, donation_date, comments
             donor_firstname = request.form.get('donor_firstname')
             donor_lastname = request.form.get('donor_lastname')
@@ -231,58 +231,59 @@ def edit():
             donation_date = request.form.get('donation_date')
             comments = request.form.get('comments')
             
-            # sb2648
+            # sb2648 11/26/2023
             # edit-3 donor_firstname is required (flash proper error message)
             if not donor_firstname:
                 flash("Donor First Name is required.", "error")
                 has_error = True
-            # sb2648
+            # sb2648 11/26/2023
             # edit-4 donor_lastname is required (flash proper error message)
             if not donor_lastname:
                 flash("Donor Last Name is required.", "error")
                 has_error = True
-            # sb2648
+            # sb2648 11/26/2023
             # edit-5 donor_email is required (flash proper error message)
             if not donor_email:
                 flash("Donor Email is required.", "error")
                 has_error = True
-            # sb2648
+            # sb2648 11/26/2023
             # edit-5a email must be in proper format (flash proper message)
             elif not is_valid_email(donor_email):
                 flash("Invalid email format.", "error")
                 has_error = True
-            # sb2648
+            # sb2648 11/26/2023
             # edit-6 organization_id is required (flash proper error message)
             if not organization_id:
                 flash("Organization ID is required.", "error")
                 has_error = True
-            # sb2648
+            # sb2648 11/26/2023
             # edit-7 item_name is required (flash proper error message)
             if not item_name:
                 flash("Item Name is required.", "error")
                 has_error = True
-            # sb2648
+            # sb2648 11/26/2023
             # edit-8 item_description is optional
             if not item_description:
                 has_error = False
-            # sb2648
+            # sb2648 11/26/2023
             # edit-9 item_quantity is required and must be more than 0 (flash proper error message)
             if not item_quantity or int(item_quantity) <= 0:
                 flash("Item Quantity must be greater than 0.", "error")
                 has_error = True
-            # sb2648
+            # sb2648 11/26/2023
             # edit-10 donation_date is required and must be within the past 30 days
             if not donation_date or not is_valid_date(donation_date):
                 flash("Invalid or missing donation date.", "error")
                 has_error = True
-            # sb2648
+            # sb2648 11/26/2023
             # edit-11 comments are optional
             if not comments:
                 has_error = False
-            has_error = False # use this to control whether or not an insert occurs
+            has_error = False # use this to control -whether or not an insert occurs
                 
             if not has_error:
                 try:
+                    # sb2648 11/26/2023
                     # edit-12 fill in proper update query
                     result = DB.update("""
                     UPDATE IS601_MP3_Donations SET
@@ -301,13 +302,13 @@ def edit():
                     if result.status:
                         flash("Updated record", "success")
                 except Exception as e:
-                    # sb2648
+                    # sb2648 11/26/2023
                     # edit-13 make this user-friendly
                     print(f"update error {e}")
                     flash(e, "danger")
         
         try:
-            # sb2648
+            # sb2648 11/26/2023
             # edit-14 fetch the updated data 
             result = DB.selectOne("""SELECT 
             d.donor_firstname, d.donor_lastname, d.donor_email,d.organization_id, d.item_name, d.item_description,
@@ -320,7 +321,7 @@ def edit():
             if result.status:
                 row = result.row
         except Exception as e:
-            # sb2648
+            # sb2648 11/26/2023
             # edit-15 make this user-friendly
             flash(str(e), "danger")
     
@@ -328,14 +329,14 @@ def edit():
 
 @donations.route("/delete", methods=["GET"])
 def delete():
-    # sb2648
+    # sb2648 11/26/202
     # delete-1 if id is missing, flash necessary message and redirect to search
     donation_id = request.args.get('id')
     if not donation_id:
         flash("Missing donation ID. Unable to delete.", "danger")
         return redirect(url_for("donations.search"))
     
-    # sb2648
+    # sb2648 11/26/202
     # delete-2 delete donation by id (fetch the id from the request)
     try:
         query = "DELETE FROM IS601_MP3_Donations WHERE id = %s;"
@@ -349,10 +350,10 @@ def delete():
             flash("Error deleting donation. Please try again.", "error")
     except Exception as e:
         flash(str(e), "error")
-    # sb2648
+    # sb2648 11/26/202
     # delete-4 pass all argument except id to this route
     args = request.args.copy()
     args.pop('id', None)
-    # sb2648
+    # sb2648 11/26/202
     # delete-5 redirect to donation search
     return redirect(url_for("donations.search", **args))
