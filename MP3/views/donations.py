@@ -311,7 +311,7 @@ def edit():
             # edit-14 fetch the updated data 
             result = DB.selectOne("""SELECT 
             d.donor_firstname, d.donor_lastname, d.donor_email,d.organization_id, d.item_name, d.item_description,
-            d.item_quantity, d.donation_date, d.comments
+            d.item_quantity, d.donation_date, d.comments, o.id
             FROM IS601_MP3_Donations AS d
             LEFT JOIN IS601_MP3_Organizations AS o ON d.organization_id = o.id
             WHERE d.id = %s"""

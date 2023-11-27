@@ -82,7 +82,6 @@ def importCSV():
                     # importcsv-4: extract donation data and append to donation list
                     # as a dict only with donation data if all donation fields are present (refer to above SQL)
                     if all(key in row for key in ['donor_name', 'donor_email', 'item_name', 'item_description', 'item_quantity', 'donation_date', 'comments', 'organization_name']):
-                        date_format = "%Y-%m-%d"
                         donations.append({
                             "donor_firstname": row["donor_name"].split()[0] if row["donor_name"] else '',
                             "donor_lastname": row["donor_name"].split()[1] if len(row["donor_name"].split()) > 1 else '',
