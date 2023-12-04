@@ -43,8 +43,9 @@
 </head>
 
 <body>
-    <div id="header" class="header bg-light text-center">
-        Movie Entertainer
+    <div id="header">
+        {% include "nav.html" %}
+        {% include 'flash.html' %}
     </div>
     <div id="content">{% block content %}{% endblock %}</div>
     <div id="footer" class="footer bg-light text-center">

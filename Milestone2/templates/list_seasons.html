@@ -2,8 +2,6 @@
 {% block title %}Episodes list{% endblock %}
 {% block content %}
 <div class="container-fluid mt-2">
-    <h2>Movie and TV Series List</h2>
-
     <h1 class="display-4 text-center">Seasons Details</h1>
     
     <div class="row row-cols-1 row-cols-md-3 g-4">
@@ -12,13 +10,11 @@
                 <div class="card">
                     <img src="{{ season.poster_url }}" class="card-img-top" alt="Poster" >
                     <div class="card-body">
-                        <h5 class="card-title"><a href="{{ url_for('episodes.get_episodes_by_season', season_id=season.id) }}">{{ season.name }}</a></h5>
+                        <h5 class="card-title"><a href="{{ url_for('episodes.get_episodes_by_season', season_id=season.id) }}">{{ season.name }}, Episodes: {{ season.episode_count }}</a></h5>
                         <p class="card-text">{{ season.overview }}</p>
                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item">Season ID: {{ season.id }}</li>
-                            <li class="list-group-item">Number: {{ season.number }}</li>
-                            <li class="list-group-item">Air Date: {{ season.air_date }}</li>
-                            <li class="list-group-item">Episode Count: {{ season.episode_count }}</li>
+                            <li class="list-group-item">Release Date: {{ season.air_date }}</li>
+                            <a href="{{ url_for('seasons.edit_season', id=season['id']) }}" class="btn btn-primary m-1">Edit</a>
                         </ul>
                     </div>
                 </div>
