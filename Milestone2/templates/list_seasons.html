@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block title %}Episodes list{% endblock %}
+{% block content %}
+<div class="container-fluid mt-2">
+    <h2>Movie and TV Series List</h2>
+
+    <h1 class="display-4 text-center">Seasons Details</h1>
+    
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for season in rows %}
+            <div class="col">
+                <div class="card">
+                    <img src="{{ season.poster_url }}" class="card-img-top" alt="Poster" >
+                    <div class="card-body">
+                        <h5 class="card-title"><a href="{{ url_for('episodes.get_episodes_by_season', season_id=season.id) }}">{{ season.name }}</a></h5>
+                        <p class="card-text">{{ season.overview }}</p>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Season ID: {{ season.id }}</li>
+                            <li class="list-group-item">Number: {{ season.number }}</li>
+                            <li class="list-group-item">Air Date: {{ season.air_date }}</li>
+                            <li class="list-group-item">Episode Count: {{ season.episode_count }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
