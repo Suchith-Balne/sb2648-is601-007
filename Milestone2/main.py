@@ -33,8 +33,8 @@ def create_app(config_filename=''):
     login_manager.init_app(app)
     # app.config.from_pyfile(config_filename)
     with app.app_context():
-        from views.hello import hello
-        app.register_blueprint(hello)
+        # from views.index import hello
+        # app.register_blueprint(hello)
         from auth.auth import auth
         app.register_blueprint(auth)
         from roles.roles import roles
@@ -43,6 +43,10 @@ def create_app(config_filename=''):
         app.register_blueprint(home)
         from utils.list_titles import title
         app.register_blueprint(title)
+        from views.episodes import episodes
+        app.register_blueprint(episodes)
+        from views.seasons import seasons
+        app.register_blueprint(seasons)
 
         # load the extension
         principals = Principal(app) # must be defined/initialized for identity to work (flask_principal)

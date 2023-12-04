@@ -11,18 +11,31 @@
         integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
         crossorigin="anonymous"></script>
     <style>
+        body {
+            margin: 2;
+            padding: 2;
+        }
         .footer {
-            position: absolute;
             bottom: 0;
             width: 100%;
             height: 60px;
             line-height: 60px;
+            z-index: 2;
+        }
+
+        .content {
+            margin-bottom: 80px; /* Adjust margin-bottom to be equal to the height of the footer */
+            z-index: 1;
         }
 
         .header {
+            position: absolute;
             top: 0;
+            width: 100%;
             height: 60px;
             line-height: 60px;
+            background-color: #f2f2f2;
+            z-index: 2;
         }
     </style>
     <title>{% block title %}{% endblock %} - Sample</title>

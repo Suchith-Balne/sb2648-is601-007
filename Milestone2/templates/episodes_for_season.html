@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block title %}Episodes for seasons{% endblock %}
+{% block content %}
+<div class="container-fluid mt-2">
+    <h2>Episodes for Season {{ season_id }}</h2>
+
+    {% if rows %}
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for episode in rows %}
+                <div class="col">
+                    <div class="card">
+                        <!-- Set the max-width and max-height for the thumbnail -->
+                        <img src="{{ episode.thumbnail_url }}" class="card-img-top" alt="Thumbnail" style="max-width: 100%; max-height: 200px;">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ episode.name }}</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">Episode Number: {{ episode.episode_number }}</li>
+                                <li class="list-group-item">Season Number: {{ episode.season_number }}</li>
+                                <li class="list-group-item">TMDB ID: {{ episode.tmdb_id }}</li>
+                                <li class="list-group-item">IMDB ID: {{ episode.imdb_id }}</li>
+                                <li class="list-group-item">Release Date: {{ episode.release_date }}</li>
+                                <li class="list-group-item">Runtime Minutes: {{ episode.runtime_minutes }}</li>
+                                <li class="list-group-item">Overview: {{ episode.overview }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No Episodes available for Season {{ season_id }}</p>
+    {% endif %}
+</div>
+{% endblock %}
