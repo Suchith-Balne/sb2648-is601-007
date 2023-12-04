@@ -1,0 +1,26 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="flashes">
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category or 'info' }} thin-flash" role="alert">{{ message }}</div>
+    {% endfor %}
+</div>
+
+<script>
+    setTimeout(function() {
+        var flashes = document.querySelector('.flashes');
+        if (flashes) {
+            flashes.style.visibility = 'hidden';
+        }
+    }, 5000);
+</script>
+<style>
+    .thin-flash {
+        padding: 0.5rem; /* Adjust padding as needed */
+        margin-bottom: 0.5rem; /* Adjust margin as needed */
+        /* Additional styling if necessary */
+    }
+</style>
+
+{% endif %}
+{% endwith %}

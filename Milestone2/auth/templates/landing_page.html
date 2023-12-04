@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block title %}Landing Page{% endblock %}
+{% block content %}
+<div class="container-fluid ">
+    <div class="jumbotron d-flex align-items-center justify-content-center min-vh-100">
+        <h1 class="display-4">Welcome {{current_user.username}}</h1>
+    </div>
+</div>
+{% endblock %}

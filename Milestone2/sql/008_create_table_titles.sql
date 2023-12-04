@@ -1,0 +1,23 @@
+CREATE TABLE titles (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    original_title VARCHAR(255),
+    plot_overview TEXT,
+    type VARCHAR(50),
+    runtime_minutes INTEGER,
+    year INTEGER,
+    end_year INTEGER,
+    release_date DATE,
+    imdb_id VARCHAR(20),
+    tmdb_id INTEGER,
+    tmdb_type VARCHAR(50),
+    user_rating DECIMAL(3, 1),
+    critic_score INTEGER,
+    us_rating VARCHAR(10),
+    poster VARCHAR(255),
+    backdrop VARCHAR(255),
+    original_language VARCHAR(10),
+    trailer VARCHAR(255),
+    trailer_thumbnail VARCHAR(255),
+    relevance_percentile DECIMAL(5, 2)
+);
