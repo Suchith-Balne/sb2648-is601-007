@@ -7,7 +7,6 @@ on:
   push:
     branches:
       - dev
-      - Milestone24
 
 # Your workflows jobs.
 jobs:
