@@ -8,7 +8,6 @@ seasons = Blueprint('seasons', __name__, url_prefix='/seasons')
 @seasons.route('/list', methods=["GET"])
 def get_seasons():
     try:
-        # Replace "SELECT * FROM episodes" with your actual query
         result = DB.selectAll("SELECT * FROM seasons")
         if result.status:
             rows = result.rows
