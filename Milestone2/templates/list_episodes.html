@@ -3,6 +3,30 @@
 {% block content %}
 <div class="container-fluid mt-2">
     <h1 class="display-4 text-center">Episodes</h1>
+
+    <form method="GET">
+        <div class="row">
+            <div class="col-auto">
+                <label class="form-label" for="episode_name">Episode Name</label>
+                <input type="text" name="episode_name" class="form-control" id="episode_name" placeholder="Episode Name"
+                    value="{{request.args.get('episode_name') or ''}}">
+            </div>
+            <div class="col-auto">
+                <label class="form-label" for="episode_name">Season Number</label>
+                <input type="number" name="season_number" class="form-control" id="season_number" placeholder="Season Number"
+                    value="{{request.args.get('season_number') or ''}}">
+            </div>
+            <div class="col-auto">
+                <label class="form-label" for="limit">Limit</label>
+                <input type="number" name="limit" class="form-control" id="limit" value="{{ request.args.get('limit', 10) }}">
+            </div>
+            <div class="col-auto">
+                <input type="submit" class="btn btn-primary form-control mt-4" value="Filter" />
+            </div>
+            <div class="col-auto">
+                <a href="?" class="btn btn-secondary form-control mt-4">Reset</a>
+            </div>
+        </form>
     
     <div class="row row-cols-1 row-cols-md-5 g-4">
         {% for episode in rows %}

@@ -1,13 +1,37 @@
 from sql.db import DB
-from flask import Blueprint, redirect, render_template, request, flash, url_for
+from flask import Blueprint, redirect, render_template, request, flash, url_for, jsonify
 
 episodes = Blueprint('episodes', __name__, url_prefix='/episodes')
 
 @episodes.route('/list', methods=["GET"])
 def get_episodes():
+    rows = []
+    args = {}
+    episode_name = request.args.get("episode_name")
+    limit = request.args.get("limit", 10)
+    season_number = request.args.get("season number")
+    
+    query = "SELECT * FROM episodes WHERE 1=1"
+    
+    if episode_name:
+        query += " AND name LIKE %(episode_name)s"
+        args["episode_name"] = f"%{episode_name}%"
+    if season_number:
+        query += " AND season_number = %(season_number)s"
+        args["season_number"] = f"%{season_number}%"
+    try:
+        if 1 <= int(limit) <= 100:
+            query += " LIMIT %(limit)s"
+            args["limit"] = int(limit)
+            print(args)
+        else:
+            raise ValueError("Limit must be a number between 1 and 100")
+    except ValueError as e:
+        flash(str(e), "danger")
+    
     try:
         # Replace "SELECT * FROM episodes" with your actual query
-        result = DB.selectAll("SELECT * FROM episodes")
+        result = DB.selectAll(query, args)
         if result.status:
             rows = result.rows
             print(f"Episode rows: {rows}")
