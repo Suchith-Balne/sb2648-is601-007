@@ -23,6 +23,7 @@
                             <li class="list-group-item"><strong>Runtime Minutes</strong> {{ episode.runtime_minutes }} Minutes</li>
                             <li class="list-group-item"><strong>Overview</strong> <br> {{ episode.overview }}</li>
                             <a href="{{ url_for('episodes.edit_episode', id=episode['id']) }}" class="btn btn-primary m-1">Edit</a>
+                            <a href="{{ url_for('episodes.delete_episode', id=episode['id']) }}" class="btn btn-danger m-1">Delete</a>
                         </ul>
                     </div>
                 </div>

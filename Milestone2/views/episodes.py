@@ -188,3 +188,22 @@ def edit_episode():
     return redirect(url_for("episodes.get_episodes"))
 
 
+@episodes.route('/delete', methods=["GET"])
+def delete_episode():
+    episode_id = request.args.get('id')
+
+    if not episode_id:
+        flash("Missing episode ID. Unable to delete.", "danger")
+    else:
+        try:
+            result = DB.delete("""DELETE FROM episodes
+            WHERE id = %s""", episode_id)
+            
+            if result.status:
+                print("Episode record deleted")
+                flash("Deleted Episode Record", "success")
+            else:
+                flash("An error occurred while deleting the episode record. Please try again later.", "danger")
+        except Exception as e:
+            flash("Error occured" + str(e), "error")
+    return redirect(url_for("episodes.get_episodes"))
