@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+{% block title %}{{ "Edit" if season.get("id") else "Create" }}
+Seasons{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="h1">{{ "Edit" if season.get("id") else "Create" }} Season</div>
+    <div class="container mt-5">
+
+        <form method="POST">
+
+            <div class="mb-3">
+                <label for="season_id" class="form-label">Season ID</label>
+                <input type="number" class="form-control" id="season_id" name="season_id" value="{{ season.id }}" required>
+            </div>
+
+            <!-- Poster URL -->
+            <div class="mb-3">
+                <label for="poster_url" class="form-label">Poster URL</label>
+                <input type="text" class="form-control" id="poster_url" name="poster_url" value="{{ season.poster_url }}" required>
+            </div>
+
+            <!-- Name -->
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{ season.name }}" required>
+            </div>
+
+            <!-- Overview -->
+            <div class="mb-3">
+                <label for="overview" class="form-label">Overview</label>
+                <input type="text" class="form-control" id="overview" name="overview" value="{{ season.overview }}" required></textarea>
+            </div>
+
+            <!-- Number -->
+            <div class="mb-3">
+                <label for="number" class="form-label">Number</label>
+                <input type="number" class="form-control" id="number" name="number" value="{{ season.number}}" required>
+            </div>
+
+            <!-- Air Date -->
+            <div class="mb-3">
+                <label for="air_date" class="form-label">Air Date</label>
+                <input type="date" class="form-control" id="air_date" name="air_date" value="{{ season.air_date }}" required>
+            </div>
+
+            <!-- Episode Count -->
+            <div class="mb-3">
+                <label for="episode_count" class="form-label">Episode Count</label>
+                <input type="number" class="form-control" id="episode_count" name="episode_count" value="{{ season.episode_count }}" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Create Season</button>
+        </form>
+    </div>
+    </div>
+</div>
+{% endblock %}
