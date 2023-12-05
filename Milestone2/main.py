@@ -3,11 +3,7 @@ import sys
 from flask import Flask, session, render_template
 from dotenv import load_dotenv
 load_dotenv()
-#import flask_login
-#from flask_login import current_user
-#from flask_principal import identity_loaded, RoleNeed, UserNeed, Principal
-# added so modules can be found between the two different lookup states:
-# from tests and from regular running of the app
+
 CURR_DIR = os.path.dirname(os.path.abspath(__file__))
 print(CURR_DIR)
 sys.path.append(CURR_DIR)
@@ -19,8 +15,8 @@ def page_not_found(e):
 def permission_denied(e):
     return render_template("403.html"), 403
 
-def not_logged_in(e):
-    return render_template("401.html"), 401
+# def not_logged_in(e):
+#     return render_template("401.html"), 401
 
 
 #login_manager = flask_login.LoginManager()
@@ -28,7 +24,7 @@ def create_app(config_filename=''):
     app = Flask(__name__)
     app.register_error_handler(404, page_not_found)
     app.register_error_handler(403, permission_denied)
-    app.register_error_handler(401, not_logged_in)
+    #app.register_error_handler(401, not_logged_in)
     app.secret_key = os.environ.get("SECRET_KEY", "missing_secret")
     #login_manager.init_app(app)
     # app.config.from_pyfile(config_filename)
