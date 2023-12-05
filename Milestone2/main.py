@@ -46,6 +46,7 @@ def create_app(config_filename=''):
         from views.episodes import episodes
         app.register_blueprint(episodes)
         from views.seasons import seasons
+        app.register_blueprint(seasons)
 
         # load the extension
         principals = Principal(app) # must be defined/initialized for identity to work (flask_principal)
