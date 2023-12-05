@@ -4,7 +4,8 @@ from utils.api import API
 from sql.db import DB
 
 title = Blueprint('title', __name__, url_prefix='/title')
-
+# UCID: sb2648, 11/21/2023
+# Method to update the api data to the database i.e, episodes and seasons
 @title.route("/update_data", methods=["GET"])
 def update_data():
     # Update episodes data
@@ -13,11 +14,10 @@ def update_data():
     # Update seasons data
     update_seasons_data()
 
-    # Update details data
-    #update_details_data()
-
     return jsonify(message="Data updated successfully")
 
+# UCID: sb2648, 11/21/2023
+# Method to update the episodes data to the database
 def update_episodes_data():
 
     url = "/title/3173903/episodes"
@@ -77,6 +77,8 @@ def update_episodes_data():
     else:
         return jsonify(error="Unexpected response format"), 500
     
+# UCID: sb2648, 11/21/2023
+# Method to update the seasons data to the database
 def update_seasons_data():
     url_seasons = "/title/3173903/seasons"
     response_seasons = API.get(url_seasons)
@@ -121,12 +123,4 @@ def update_seasons_data():
     except Exception as e:
         print(f"insert error in seasons data {e}")
         flash("An error occurred while inserting data to seasons table. Please try again later.", "danger")
-    
-    
-
-    # Similar logic for updating seasons data
-
-# def update_details_data():
-#     url_details = "/title/3173903/details"
-#     response_details = API.get(url_details)
 

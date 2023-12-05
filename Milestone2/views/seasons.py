@@ -3,10 +3,11 @@ from sql.db import DB
 from flask import Blueprint, redirect, render_template, request, flash, url_for
 seasons = Blueprint('seasons', __name__, url_prefix='/seasons')
 
+# sb2648, 12/03/23
+# Logic to get all the seasons from the database and display them on the list page
 @seasons.route('/list', methods=["GET"])
 def get_seasons():
     try:
-        # Replace "SELECT * FROM episodes" with your actual query
         result = DB.selectAll("SELECT * FROM seasons")
         if result.status:
             rows = result.rows
@@ -17,6 +18,8 @@ def get_seasons():
         flash("Error occured" + str(e), "error")
     return render_template("list_seasons.html", rows=rows)
 
+# sb2648, 12/03/23
+# Logic to add season to the database 
 @seasons.route('/add', methods=["GET", "POST"])
 def add_season():
     if request.method == "POST":
@@ -72,6 +75,8 @@ def add_season():
                 flash("An error occurred while creating the season record. Please try again later.", "danger")
     return render_template("manage_seasons.html",season=request.form)
 
+# sb2648, 12/03/23
+# Logic to edit seasons from the list page  and perform update to the database
 @seasons.route("/edit", methods=["GET", "POST"])
 def edit_season():
     
@@ -147,6 +152,8 @@ def edit_season():
             flash("Error occured" + str(e), "error")
     return render_template("manage_seasons.html",season=row)
 
+# sb2648, 12/05/23
+# Logic to delete episode from database
 @seasons.route("/delete", methods=["GET"])
 def delete_season():
     season_id = request.args.get('id')

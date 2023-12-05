@@ -3,31 +3,60 @@
 {% block content %}
 <div class="container-fluid mt-2">
     <h1 class="display-4 text-center">Episodes</h1>
-    
+    <!-- sb2648, 10/05/2023 -->
+    <!-- HTML form to add episodes -->
+    <form method="GET">
+        <div class="row">
+            <div class="col-auto">
+                <label class="form-label" for="episode_name">Episode Name</label>
+                <input type="text" name="episode_name" class="form-control" id="episode_name" placeholder="Episode Name"
+                    value="{{request.args.get('episode_name') or ''}}">
+            </div>
+            <div class="col-auto">
+                <label class="form-label" for="episode_name">Season Number</label>
+                <input type="number" name="season_number" class="form-control" id="season_number" placeholder="Season Number"
+                    value="{{request.args.get('season_number') or ''}}">
+            </div>
+            <div class="col-auto">
+                <label class="form-label" for="limit">Limit</label>
+                <input type="number" name="limit" class="form-control" id="limit" value="{{ request.args.get('limit', 10) }}">
+            </div>
+            <div class="col-auto">
+                <input type="submit" class="btn btn-primary form-control mt-4" value="Filter" />
+            </div>
+            <div class="col-auto">
+                <a href="?" class="btn btn-secondary form-control mt-4">Reset</a>
+            </div>
+        </form>
+
+    <!-- sb2648, 11/19/2023 -->
+    <!-- Logic to render episodes -->
     <div class="row row-cols-1 row-cols-md-5 g-4">
-        {% for episode in rows %}
-            <div class="col">
-                <div class="card h-100">
-                    <!-- Set the max-width and max-height for the thumbnail -->
-                    <img src="{{ episode.thumbnail_url }}" class="card-img-top" alt="Thumbnail" style="max-width: 100%; max-height: 200px;">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ episode.name }}</h5>
-                        <ul class="list-group list-group-flush">
-                            <!--  <li class="list-group-item">ID: {{ episode.id }}</li> -->
-                            <!--   <li class="list-group-item">Season ID: {{ episode.season_id }}</li> -->
-                            <li class="list-group-item"> <strong>Episode </strong> {{ episode.episode_number }}</li>
-                            <li class="list-group-item"> <strong>Season </strong>{{ episode.season_number }}</li>
-                            <!--  <li class="list-group-item">TMDB ID: {{ episode.tmdb_id }}</li> -->
-                            <!--  <li class="list-group-item">IMDB ID: {{ episode.imdb_id }}</li> -->
-                            <li class="list-group-item"><strong>Release Date </strong> {{ episode.release_date }}</li>
-                            <li class="list-group-item"><strong>Runtime Minutes</strong> {{ episode.runtime_minutes }} Minutes</li>
-                            <li class="list-group-item"><strong>Overview</strong> <br> {{ episode.overview }}</li>
-                            <a href="{{ url_for('episodes.edit_episode', id=episode['id']) }}" class="btn btn-primary m-1">Edit</a>
-                        </ul>
+        {% if rows and rows|length > 0 %}
+            {% for episode in rows %}
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="{{ episode.thumbnail_url }}" class="card-img-top" alt="Thumbnail" style="max-width: 100%; max-height: 200px;">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ episode.name }}</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"> <strong>Episode </strong> {{ episode.episode_number }}</li>
+                                <li class="list-group-item"> <strong>Season </strong>{{ episode.season_number }}</li>
+                                <li class="list-group-item"><strong>Release Date </strong> {{ episode.release_date }}</li>
+                                <li class="list-group-item"><strong>Runtime Minutes</strong> {{ episode.runtime_minutes }} Minutes</li>
+                                <li class="list-group-item"><strong>Overview</strong> <br> {{ episode.overview }}</li>
+                                <a href="{{ url_for('episodes.edit_episode', id=episode['id']) }}" class="btn btn-primary m-1">Edit</a>
+                                <a href="{{ url_for('episodes.delete_episode', id=episode['id']) }}" class="btn btn-danger m-1">Delete</a>
+                            </ul>
+                        </div>
                     </div>
                 </div>
+            {% endfor %}
+            {% else %}
+            <div class="container-fluid">
+                <p class="text-danger"> No episodes,try changing filter criteria </p>
             </div>
-        {% endfor %}
+        {% endif %}
     </div>
 </div>
 {% endblock %}
