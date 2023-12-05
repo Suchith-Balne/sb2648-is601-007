@@ -2,7 +2,9 @@
 {% block title %}Season Episodes{% endblock %}
 {% block content %}
 <div class="container-fluid mt-2">
-    
+    <!-- sb2648, 11/19/2023 -->
+    <!-- Logic to render search form -->
+
     {% if season_name and season_overview %}
         <div class="card mb-3">
             <div class="card-body">
@@ -19,12 +21,11 @@
             </div>
         </div>
     {% endif %}
-    
     {% if season_name is not none %}
         <h2 class="display-4 text-center">Episodes</h2>
     {% endif %}
-
     <hr>
+        <!-- Logic to render episodes for seasons  -->
 
     {% if rows and not no_data%}
         <div class="row row-cols-1 row-cols-md-4 g-4">
@@ -47,6 +48,8 @@
             {% endfor %}
         </div>
     {% else %}
+
+    <!-- Logic to render episodes for seasons if no episodes are present -->
 
     <div class="jumbotron d-flex align-items-center justify-content-center">
         <div class="text-center">

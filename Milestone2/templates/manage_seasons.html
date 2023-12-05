@@ -5,9 +5,9 @@ Seasons{% endblock %}
 <div class="container-fluid">
     <div class="h1">{{ "Edit" if season.get("id") else "Create" }} Season</div>
     <div class="container mt-5">
-
+        <!-- sb2648, 11/25/2023 -->
+        <!-- HTML form for the add/edit seasons-->
         <form method="POST">
-
             <div class="mb-3">
                 <label for="season_id" class="form-label">Season ID</label>
                 <input type="number" class="form-control" id="season_id" name="season_id" value="{{ season.id }}" required>

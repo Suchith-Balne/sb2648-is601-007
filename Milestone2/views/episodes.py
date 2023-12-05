@@ -4,6 +4,8 @@ from flask import Blueprint, redirect, render_template, request, flash, url_for,
 episodes = Blueprint('episodes', __name__, url_prefix='/episodes')
 
 @episodes.route('/list', methods=["GET"])
+# sb2648, 12/03/23
+# Logic to get all the episodes list and filter the list from the form
 def get_episodes():
     rows = []
     args = {}
@@ -30,7 +32,6 @@ def get_episodes():
         flash(str(e), "danger")
     
     try:
-        # Replace "SELECT * FROM episodes" with your actual query
         result = DB.selectAll(query, args)
         if result.status:
             rows = result.rows
@@ -41,6 +42,8 @@ def get_episodes():
         flash("Error occured" + str(e), "error")
     return render_template("list_episodes.html", rows=rows)
 
+# sb2648, 12/03/23
+# Logic to get episodes for particluar season
 @episodes.route('/<int:season_id>', methods=["GET"])
 def get_episodes_by_season(season_id):
     try:
@@ -68,6 +71,8 @@ def get_episodes_by_season(season_id):
         flash("Error occured" + str(e), "error")
     return render_template("episodes_for_season.html", rows=rows, season_id=season_id,season_name=season_name, season_overview=season_overview)
 
+# sb2648, 12/03/23
+# Logic to add episode to the database
 @episodes.route('/add', methods=["GET","POST"])
 def add_episode():
     if request.method == "POST":
@@ -130,7 +135,8 @@ def add_episode():
                 
     return render_template("manage_episodes.html",episode=request.form)
 
-
+# sb2648, 12/03/23
+# Logic to edit episode and perform update to the database
 @episodes.route('/edit', methods=["GET","POST"])
 def edit_episode():
     episode_id = request.args.get('id')
@@ -211,7 +217,8 @@ def edit_episode():
             
     return redirect(url_for("episodes.get_episodes"))
 
-
+# sb2648, 12/03/23
+# Logic to delete episode from database
 @episodes.route('/delete', methods=["GET"])
 def delete_episode():
     episode_id = request.args.get('id')

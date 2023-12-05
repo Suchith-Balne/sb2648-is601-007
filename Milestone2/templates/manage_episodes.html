@@ -2,6 +2,8 @@
 {% block title %}Create Episode{% endblock %}
 {% block content %}
 <div class="container mt-4">
+    <!-- sb2648, 11/25/2023 -->
+    <!-- HTML form for the add/edit episodes-->
     <h2>{{ "Edit" if episode.get("id") else "Create" }} Episode</h2>
     <form method="post">
         <div class="form-group">
