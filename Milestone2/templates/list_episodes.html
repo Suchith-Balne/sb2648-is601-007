@@ -4,24 +4,24 @@
 <div class="container-fluid mt-2">
     <h1 class="display-4 text-center">Episodes</h1>
     
-    <div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="row row-cols-1 row-cols-md-5 g-4">
         {% for episode in rows %}
             <div class="col">
-                <div class="card">
+                <div class="card h-100">
                     <!-- Set the max-width and max-height for the thumbnail -->
                     <img src="{{ episode.thumbnail_url }}" class="card-img-top" alt="Thumbnail" style="max-width: 100%; max-height: 200px;">
                     <div class="card-body">
                         <h5 class="card-title">{{ episode.name }}</h5>
                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item">ID: {{ episode.id }}</li>
-                            <li class="list-group-item">Season ID: {{ episode.season_id }}</li>
-                            <li class="list-group-item">Episode Number: {{ episode.episode_number }}</li>
-                            <li class="list-group-item">Season Number: {{ episode.season_number }}</li>
-                            <li class="list-group-item">TMDB ID: {{ episode.tmdb_id }}</li>
-                            <li class="list-group-item">IMDB ID: {{ episode.imdb_id }}</li>
-                            <li class="list-group-item">Release Date: {{ episode.release_date }}</li>
-                            <li class="list-group-item">Runtime Minutes: {{ episode.runtime_minutes }}</li>
-                            <li class="list-group-item">Overview: {{ episode.overview }}</li>
+                            <!--  <li class="list-group-item">ID: {{ episode.id }}</li> -->
+                            <!--   <li class="list-group-item">Season ID: {{ episode.season_id }}</li> -->
+                            <li class="list-group-item"> <strong>Episode </strong> {{ episode.episode_number }}</li>
+                            <li class="list-group-item"> <strong>Season </strong>{{ episode.season_number }}</li>
+                            <!--  <li class="list-group-item">TMDB ID: {{ episode.tmdb_id }}</li> -->
+                            <!--  <li class="list-group-item">IMDB ID: {{ episode.imdb_id }}</li> -->
+                            <li class="list-group-item"><strong>Release Date </strong> {{ episode.release_date }}</li>
+                            <li class="list-group-item"><strong>Runtime Minutes</strong> {{ episode.runtime_minutes }} Minutes</li>
+                            <li class="list-group-item"><strong>Overview</strong> <br> {{ episode.overview }}</li>
                         </ul>
                     </div>
                 </div>

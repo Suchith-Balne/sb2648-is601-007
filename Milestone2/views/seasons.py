@@ -139,12 +139,31 @@ def edit_season():
                     return redirect(url_for("seasons.get_seasons"))
         try:
             result = DB.selectOne("""SELECT * FROM seasons
-            WHERE id = %s"""
-            , season_id)
+            WHERE id = %s""", season_id)
             
             if result.status:
                 row = result.row
         except Exception as e:
             flash("Error occured" + str(e), "error")
     return render_template("manage_seasons.html",season=row)
+
+@seasons.route("/delete", methods=["GET"])
+def delete_season():
+    season_id = request.args.get('id')
+    if not season_id:
+        flash("Missing season ID. Unable to delete.", "danger")
+    else:
+        try:
+            result = DB.delete("""
+            DELETE FROM seasons
+            WHERE id = %s
+            """, season_id)
+            if result.status:
+                print("Season record deleted")
+                flash("Deleted Season Record", "success")
+            else:
+                flash("An error occurred while deleting the season record. Please try again later.", "danger")
+        except Exception as e:
+            flash("Error occured" + str(e), "error")
+    return redirect(url_for("seasons.get_seasons"))
                 
