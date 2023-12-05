@@ -25,7 +25,6 @@ def get_episodes():
         if 1 <= int(limit) <= 100:
             query += " LIMIT %(limit)s"
             args["limit"] = int(limit)
-            print(args)
         else:
             raise ValueError("Limit must be a number between 1 and 100")
     except ValueError as e:

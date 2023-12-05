@@ -105,7 +105,6 @@ class DB:
 
     @staticmethod
     def selectAll(queryString, *args):
-        print(queryString)
         return DB.__runQuery(CRUD.READ, True, queryString, args)
 
 

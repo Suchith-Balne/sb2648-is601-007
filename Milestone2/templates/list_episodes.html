@@ -32,25 +32,31 @@
     <!-- sb2648, 11/19/2023 -->
     <!-- Logic to render episodes -->
     <div class="row row-cols-1 row-cols-md-5 g-4">
-        {% for episode in rows %}
-            <div class="col">
-                <div class="card h-100">
-                    <img src="{{ episode.thumbnail_url }}" class="card-img-top" alt="Thumbnail" style="max-width: 100%; max-height: 200px;">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ episode.name }}</h5>
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item"> <strong>Episode </strong> {{ episode.episode_number }}</li>
-                            <li class="list-group-item"> <strong>Season </strong>{{ episode.season_number }}</li>
-                            <li class="list-group-item"><strong>Release Date </strong> {{ episode.release_date }}</li>
-                            <li class="list-group-item"><strong>Runtime Minutes</strong> {{ episode.runtime_minutes }} Minutes</li>
-                            <li class="list-group-item"><strong>Overview</strong> <br> {{ episode.overview }}</li>
-                            <a href="{{ url_for('episodes.edit_episode', id=episode['id']) }}" class="btn btn-primary m-1">Edit</a>
-                            <a href="{{ url_for('episodes.delete_episode', id=episode['id']) }}" class="btn btn-danger m-1">Delete</a>
-                        </ul>
+        {% if rows and rows|length > 0 %}
+            {% for episode in rows %}
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="{{ episode.thumbnail_url }}" class="card-img-top" alt="Thumbnail" style="max-width: 100%; max-height: 200px;">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ episode.name }}</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"> <strong>Episode </strong> {{ episode.episode_number }}</li>
+                                <li class="list-group-item"> <strong>Season </strong>{{ episode.season_number }}</li>
+                                <li class="list-group-item"><strong>Release Date </strong> {{ episode.release_date }}</li>
+                                <li class="list-group-item"><strong>Runtime Minutes</strong> {{ episode.runtime_minutes }} Minutes</li>
+                                <li class="list-group-item"><strong>Overview</strong> <br> {{ episode.overview }}</li>
+                                <a href="{{ url_for('episodes.edit_episode', id=episode['id']) }}" class="btn btn-primary m-1">Edit</a>
+                                <a href="{{ url_for('episodes.delete_episode', id=episode['id']) }}" class="btn btn-danger m-1">Delete</a>
+                            </ul>
+                        </div>
                     </div>
                 </div>
+            {% endfor %}
+            {% else %}
+            <div class="container-fluid">
+                <p class="text-danger"> No episodes,try changing filter criteria </p>
             </div>
-        {% endfor %}
+        {% endif %}
     </div>
 </div>
 {% endblock %}
