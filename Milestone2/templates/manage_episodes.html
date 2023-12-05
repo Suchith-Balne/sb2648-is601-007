@@ -2,58 +2,58 @@
 {% block title %}Create Episode{% endblock %}
 {% block content %}
 <div class="container mt-4">
-    <h2>Add Episode</h2>
+    <h2>{{ "Edit" if episode.get("id") else "Create" }} Episode</h2>
     <form method="post">
         <div class="form-group">
             <label for="name">Episode Name:</label>
-            <input type="text" class="form-control" id="name" name="name" required>
+            <input type="text" class="form-control" id="name" name="name" value="{{ episode.name }}" required>
         </div>
 
         <div class="form-group">
             <label for="episode_number">Episode Number:</label>
-            <input type="number" class="form-control" id="episode_number" name="episode_number" required>
+            <input type="number" class="form-control" id="episode_number" name="episode_number" value="{{ episode.episode_number }}" required>
         </div>
 
         <div class="form-group">
             <label for="season_id">Season ID:</label>
-            <input type="number" class="form-control" id="season_id" name="season_id" required>
+            <input type="number" class="form-control" id="season_id" name="season_id" value="{{ episode.season_id }}" required>
         </div>
 
         <div class="form-group">
             <label for="season_number">Season Number:</label>
-            <input type="number" class="form-control" id="season_number" name="season_number" required>
+            <input type="number" class="form-control" id="season_number" name="season_number" value="{{ episode.season_number }}" required>
         </div>
 
         <div class="form-group">
             <label for="tmdb_id">TMDB ID:</label>
-            <input type="number" class="form-control" id="tmdb_id" name="tmdb_id">
+            <input type="number" class="form-control" id="tmdb_id" value="{{ episode.tmdb_id }}" name="tmdb_id">
         </div>
 
         <div class="form-group">
             <label for="imdb_id">IMDB ID:</label>
-            <input type="text" class="form-control" id="imdb_id" name="imdb_id">
+            <input type="text" class="form-control" id="imdb_id" value="{{ episode.imdb_id }}" name="imdb_id">
         </div>
 
         <div class="form-group">
             <label for="thumbnail_url">Thumbnail URL:</label>
-            <input type="text" class="form-control" id="thumbnail_url" name="thumbnail_url">
+            <input type="text" class="form-control" id="thumbnail_url" value="{{ episode.thumbnail_url }}" name="thumbnail_url">
         </div>
 
         <div class="form-group">
             <label for="release_date">Release Date:</label>
-            <input type="date" class="form-control" id="release_date" name="release_date">
+            <input type="date" class="form-control" id="release_date" value="{{ episode.release_date }}" name="release_date">
         </div>
 
         <div class="form-group">
             <label for="runtime_minutes">Runtime Minutes:</label>
-            <input type="number" class="form-control" id="runtime_minutes" name="runtime_minutes">
+            <input type="number" class="form-control" id="runtime_minutes" value="{{ episode.runtime_minutes }}" name="runtime_minutes">
         </div>
 
         <div class="form-group">
             <label for="overview">Overview:</label>
-            <textarea class="form-control" id="overview" name="overview" rows="4"></textarea>
+            <input type="text" class="form-control" id="overview" name="overview" value="{{ episode.overview }}" rows="4">
         </div>
 
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary mt-1">Submit</button>
 
 {% endblock %}
