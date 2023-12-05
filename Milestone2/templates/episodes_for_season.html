@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+{% block title %}Season Episodes{% endblock %}
+{% block content %}
+<div class="container-fluid mt-2">
+    <!-- sb2648, 11/19/2023 -->
+    <!-- Logic to render search form -->
+
+    {% if season_name and season_overview %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title text-center display-6">{{ season_name }}</h5>
+                <h4><strong>Overview</strong></h4>
+                <p class="card-text">{{ season_overview }}</p>
+            </div>
+        </div>
+    {% else %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Season Details</h5>
+                <p class="card-text">No information available for this season.</p>
+            </div>
+        </div>
+    {% endif %}
+    {% if season_name is not none %}
+        <h2 class="display-4 text-center">Episodes</h2>
+    {% endif %}
+    <hr>
+        <!-- Logic to render episodes for seasons  -->
+
+    {% if rows and not no_data%}
+        <div class="row row-cols-1 row-cols-md-4 g-4">
+            {% for episode in rows %}
+                <div class="col">
+                    <div class="card h-100">
+                        <!-- Set the max-width and max-height for the thumbnail -->
+                        <img src="{{ episode.thumbnail_url }}" class="card-img-top" alt="Thumbnail" style="max-width: 100%; max-height: 200px;">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ episode.name }}</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><strong>Episode </strong> {{ episode.episode_number }}</li>
+                                <li class="list-group-item"><strong>Release Date</strong> {{ episode.release_date }}</li>
+                                <li class="list-group-item"><strong>Runtime Minutes</strong> {{ episode.runtime_minutes }} minutes</li>
+                                <li class="list-group-item"><strong>Overview</strong> <br>{{ episode.overview }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+
+    <!-- Logic to render episodes for seasons if no episodes are present -->
+
+    <div class="jumbotron d-flex align-items-center justify-content-center">
+        <div class="text-center">
+            <h1 class="display-4">Episodes</h1>
+            <hr>
+            <p class="lead mt-3">Oops! No Episodes available for this season</p>
+        </div>
+    </div>
+    
+    {% endif %}
+</div>
+{% endblock %}
