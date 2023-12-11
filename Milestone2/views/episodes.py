@@ -431,9 +431,7 @@ def unwatched():
     WHERE e.id not in (SELECT DISTINCT episode_id FROM episodes_watchlist WHERE episode_id = e.id)
     """
     where =""
-    # if username:
-    #     args["username"] = f"%{username}%"
-    #     where += " AND username LIKE %(username)s"
+
     if episode_name:
         args["episode_name"] = f"%{episode_name}%"
         where += " AND name LIKE %(episode_name)s"
@@ -464,3 +462,55 @@ def unwatched():
     total_records = get_totals("episodes e WHERE e.id not in (SELECT DISTINCT episode_id FROM episodes_watchlist) ")
     print(total_records)
     return render_template("unwatchedlist.html", rows=rows, total_records = total_records, title = "Unwatched Episodes")
+
+@episodes.route("/manage", methods=["GET"])
+@admin_permission.require(http_exception=403)
+@login_required
+def manage():
+    users = []
+    episodes = []
+    username = request.args.get("username")
+    episode_name = request.args.get("episode_name")
+    print(username)
+    print(episode_name)
+    if username and episode_name:
+        result = DB.selectAll("SELECT id, username FROM IS601_Users WHERE username like %(username)s LIMIT 25", {"username":f"%{username}%"})
+        if result.status and result.rows:
+            users = result.rows
+        result = DB.selectAll("SELECT id, name FROM episodes WHERE name like %(episode_name)s LIMIT 25", {"episode_name":f"%{episode_name}%"})
+        if result.status and result.rows:
+            episodes = result.rows
+    return render_template("episodes_association.html", users=users, episodes=episodes, title = "Manage")
+
+@episodes.route("/manage_association", methods=["POST"])
+@admin_permission.require(http_exception=403)
+@login_required
+def manage_assoc():
+    users = request.form.getlist("users[]")
+    episodes = request.form.getlist("episodes[]")
+    print(users, episodes)
+    args = {**request.args}
+    if users and episodes: # we need both for this to work
+        mappings = []
+        for user in users:
+            for episode in episodes:
+                mappings.append({"user_id": user, "episode_id":episode})
+        if len(mappings) > 0:
+            for mapping in mappings:
+                try:
+                    result = DB.insertOne("INSERT INTO episodes_watchlist (user_id, episode_id) VALUES(%(user_id)s, %(episode_id)s) ", mapping)
+                    if result.status:
+                        pass
+                except Exception as e:
+                    print(f"Exception occured while associating eppisodes: {e}")
+                    DB.delete("DELETE from episodes_watchlist where user_id = %(user_id)s and episode_id = %(episode_id)s", mapping)
+            flash("Successfully associated/unassociated episodes for the user", "success")
+        else:
+            flash("No user/episode mappings", "danger")
+
+    if "users" in args:
+        del args["users"]
+    if "episodes" in args:
+        del args["episodes"]
+    return redirect(url_for("episodes.manage", **args))
+            

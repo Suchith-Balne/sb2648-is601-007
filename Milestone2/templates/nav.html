@@ -12,63 +12,66 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                 {% if not current_user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{url_for('auth.login')}}">Login</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{url_for('auth.register')}}">Register</a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('auth.login')}}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('auth.register')}}">Register</a>
+                    </li>
                 {% else %}
 
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        Seasons
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{{url_for('seasons.get_seasons')}}">List</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Seasons
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{url_for('seasons.get_seasons')}}">List</a>
+                            </li>
+                            {% if current_user.has_role("Admin") %}
+                                <li><a class="dropdown-item" href="{{url_for('seasons.add_season')}}">Add</a>
+                                </li>
+                            {%endif%}
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Episodes
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{url_for('episodes.get_episodes')}}">List</a>
+                            </li>
+                            {% if current_user.has_role("Admin") %}
+                                <li><a class="dropdown-item" href="{{url_for('episodes.add_episode')}}">Add</a>
+                                </li>
+                            {%endif%}
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('auth.profile')}}">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('episodes.watchlist')}}">Watchlist</a>
+                    </li>
+                    {% if current_user.has_role("Admin") %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{url_for('episodes.associations')}}">Users Watchlist</a>
                         </li>
-                        {% if current_user.has_role("Admin") %}
-                        <li><a class="dropdown-item" href="{{url_for('seasons.add_season')}}">Add</a>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{url_for('episodes.manage')}}">Users Association</a>
                         </li>
-                        {%endif%}
-                    </ul>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        Episodes
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{{url_for('episodes.get_episodes')}}">List</a>
-                        </li>
-                        {% if current_user.has_role("Admin") %}
-                        <li><a class="dropdown-item" href="{{url_for('episodes.add_episode')}}">Add</a>
-                        </li>
-                        {%endif%}
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{url_for('auth.profile')}}">Profile</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{url_for('episodes.watchlist')}}">Watchlist</a>
-                </li>
-                {% if current_user.has_role("Admin") %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{url_for('episodes.associations')}}">Users Watchlist</a>
-                </li>
-                {% endif %}
+                    {% endif %}
                 {% endif %}
             </ul>
             {% if  current_user.is_authenticated %}
-            <ul class="nav navbar-nav navbar-right">
-                <li class="nav-item ml-2">
-                    <a class="nav-link ms-auto pull-right " href="{{url_for('auth.logout')}}">
-                        <i class="bi bi-box-arrow-in-right"> Logout</i>
-                        </a>
-                </li>
-            </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="nav-item ml-2">
+                        <a class="nav-link ms-auto pull-right " href="{{url_for('auth.logout')}}">
+                            <i class="bi bi-box-arrow-in-right"> Logout</i>
+                            </a>
+                    </li>
+                </ul>
             {% endif %}
         </div>
     </div>
