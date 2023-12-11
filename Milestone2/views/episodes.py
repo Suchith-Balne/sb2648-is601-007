@@ -1,26 +1,31 @@
 from sql.db import DB
 from flask import Blueprint, redirect, render_template, request, flash, url_for, jsonify
+from flask_login import login_user, login_required, logout_user, current_user
+from roles.permissions import admin_permission
 
 episodes = Blueprint('episodes', __name__, url_prefix='/episodes')
 
 @episodes.route('/list', methods=["GET"])
+@login_required
 # sb2648, 12/03/23
 # Logic to get all the episodes list and filter the list from the form
 def get_episodes():
     rows = []
-    args = {}
+    args = {"user_id": current_user.id}
     episode_name = request.args.get("episode_name")
     limit = request.args.get("limit", 10)
-    season_number = request.args.get("season number")
+    season_number = request.args.get("season_number")
     
-    query = "SELECT * FROM episodes WHERE 1=1"
+    query = """SELECT episodes.*,
+    IFNULL((SELECT COUNT(1) FROM episodes_watchlist WHERE user_id = %(user_id)s AND episode_id = episodes.id),0) as `is_assoc` FROM  episodes
+    WHERE 1=1"""
     
     if episode_name:
         query += " AND name LIKE %(episode_name)s"
         args["episode_name"] = f"%{episode_name}%"
     if season_number:
         query += " AND season_number = %(season_number)s"
-        args["season_number"] = f"%{season_number}%"
+        args["season_number"] = f"{season_number}"
     try:
         if 1 <= int(limit) <= 100:
             query += " LIMIT %(limit)s"
@@ -31,6 +36,8 @@ def get_episodes():
         flash(str(e), "danger")
     
     try:
+        print(f"Query: {query}")
+        print(f"Args: {args}")
         result = DB.selectAll(query, args)
         if result.status:
             rows = result.rows
@@ -44,6 +51,7 @@ def get_episodes():
 # sb2648, 12/03/23
 # Logic to get episodes for particluar season
 @episodes.route('/<int:season_id>', methods=["GET"])
+@login_required
 def get_episodes_by_season(season_id):
     try:
         print(f"Season ID: {season_id}")
@@ -68,11 +76,13 @@ def get_episodes_by_season(season_id):
             return jsonify({"status": "error", "message": "Failed to fetch episodes data"})
     except Exception as e:
         flash("Error occured" + str(e), "error")
-    return render_template("episodes_for_season.html", rows=rows, season_id=season_id,season_name=season_name, season_overview=season_overview)
+    return render_template("list_episodes.html", rows=rows, season_id=season_id,season_name=season_name, season_overview=season_overview)
 
 # sb2648, 12/03/23
 # Logic to add episode to the database
 @episodes.route('/add', methods=["GET","POST"])
+@admin_permission.require(http_exception=403)
+@login_required
 def add_episode():
     if request.method == "POST":
         season_id = request.form.get("season_id")
@@ -137,6 +147,8 @@ def add_episode():
 # sb2648, 12/03/23
 # Logic to edit episode and perform update to the database
 @episodes.route('/edit', methods=["GET","POST"])
+@admin_permission.require(http_exception=403)
+@login_required
 def edit_episode():
     episode_id = request.args.get('id')
     if not episode_id:
@@ -206,7 +218,7 @@ def edit_episode():
             
             if result.status:
                 row = result.row
-                print(f"Episode row: {row}")
+                #print(f"Episode row: {row}")
                 return render_template("manage_episodes.html",episode=row) 
             else:
                 flash("An error occurred while fetching the episode record. Please try again later.", "danger")
@@ -219,6 +231,8 @@ def edit_episode():
 # sb2648, 12/03/23
 # Logic to delete episode from database
 @episodes.route('/delete', methods=["GET"])
+@admin_permission.require(http_exception=403)
+@login_required
 def delete_episode():
     episode_id = request.args.get('id')
 
@@ -237,3 +251,34 @@ def delete_episode():
         except Exception as e:
             flash("Error occured" + str(e), "error")
     return redirect(url_for("episodes.get_episodes"))
+
+@episodes.route('/track', methods=["GET"])
+def track():
+    episode_id = request.args.get('id')
+    print(episode_id)
+    args = {**request.args}
+    del args["id"]
+    if not episode_id:
+        flash("Missing id. Unable to add to watchlist.", "danger")
+    else:
+        args = {"user_id": current_user.id, "episode_id": episode_id}
+        try:
+            try:
+                result = DB.insertOne("INSERT INTO episodes_watchlist (user_id, episode_id) VALUES (%(user_id)s, %(episode_id)s)", args)
+                print(result.status)
+                if result.status:
+                    flash("Added to watchlist", "success")
+                else:
+                    print("FGHJKLKJHGFDGHJK<L")
+                    print(result.status)
+                    flash(f"Not added {result.status}")
+            except Exception as e:
+                print(e)
+                print(f"Duplicate ececption can be ignored {e}")
+                result = DB.delete("DELETE FROM episodes_watchlist WHERE user_id = %(user_id)s AND episode_id = %(episode_id)s", args)
+                if result.status:
+                    flash("Removed from watchlist", "success")
+        except Exception as e:
+            print(f"Error occured while track/untrack {e}")
+            flash("An unhandled error occured.Please try again" + str(e), "error")
+    return redirect(url_for("episodes.get_episodes", **args))

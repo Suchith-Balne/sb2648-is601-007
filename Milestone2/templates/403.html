@@ -1,8 +1,16 @@
 {% extends "layout.html" %}
-{% block title %}403{% endblock %}
+
+{% block title %}
+    Access Denied
+{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="h1 display-4 text-center">Permission Denied, you don't have sufficent permissions</div>
-</div>
+    <div class="container-fluid d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+        <div class="text-center">
+            <div class="h1 display-4">
+                Oops! Access Denied<br>
+                It seems you don't have the necessary permissions.
+            </div>
+        </div>
+    </div>
 {% endblock %}

@@ -43,10 +43,35 @@
                                 <li class="list-group-item"> <strong>Episode </strong> {{ episode.episode_number }}</li>
                                 <li class="list-group-item"> <strong>Season </strong>{{ episode.season_number }}</li>
                                 <li class="list-group-item"><strong>Release Date </strong> {{ episode.release_date }}</li>
-                                <li class="list-group-item"><strong>Runtime Minutes</strong> {{ episode.runtime_minutes }} Minutes</li>
-                                <li class="list-group-item"><strong>Overview</strong> <br> {{ episode.overview }}</li>
+                                <li class="list-group-item"><strong>Duration</strong> {{ episode.runtime_minutes }} Minutes</li>
+                                <div class="accordion m-1" id="overviewAccordion{{ episode.id }}">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="overviewHeading{{ episode.id }}">
+                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#overviewCollapse{{ episode.id }}" aria-expanded="true" aria-controls="overviewCollapse{{ episode.id }}">
+                                                <strong>Overview</strong>
+                                            </button>
+                                        </h2>
+                                        <div id="overviewCollapse{{ episode.id }}" class="accordion-collapse collapse" aria-labelledby="overviewHeading{{ episode.id }}" data-bs-parent="#overviewAccordion{{ episode.id }}">
+                                            <div class="accordion-body">
+                                                {{ episode.overview }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--<li class="list-group-item"><strong>Association</strong> <br> {{ episode.is_assoc }}</li> -->
+                                {%if current_user.is_authenticated and current_user.has_role('Admin')%}
                                 <a href="{{ url_for('episodes.edit_episode', id=episode['id']) }}" class="btn btn-primary m-1">Edit</a>
                                 <a href="{{ url_for('episodes.delete_episode', id=episode['id']) }}" class="btn btn-danger m-1">Delete</a>
+                                {%endif%}
+                                {%if current_user.is_authenticated%}
+                                <a href="{{ url_for('episodes.track', id=episode['id']) }}" class="btn btn-danger m-1">
+                                    {%if episode['is_assoc']%} 
+                                    Untrack 
+                                    {% else %}
+                                    Track
+                                    {% endif %}
+                                </a>
+                                {%endif%}
                             </ul>
                         </div>
                     </div>
