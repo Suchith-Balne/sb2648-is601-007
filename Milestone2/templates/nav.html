@@ -28,8 +28,10 @@
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="{{url_for('seasons.get_seasons')}}">List</a>
                         </li>
+                        {% if current_user.has_role("Admin") %}
                         <li><a class="dropdown-item" href="{{url_for('seasons.add_season')}}">Add</a>
                         </li>
+                        {%endif%}
                     </ul>
                 </li>
                 <li class="nav-item dropdown">
@@ -40,13 +42,23 @@
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="{{url_for('episodes.get_episodes')}}">List</a>
                         </li>
+                        {% if current_user.has_role("Admin") %}
                         <li><a class="dropdown-item" href="{{url_for('episodes.add_episode')}}">Add</a>
                         </li>
+                        {%endif%}
                     </ul>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{url_for('auth.profile')}}">Profile</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{url_for('episodes.watchlist')}}">Watchlist</a>
+                </li>
+                {% if current_user.has_role("Admin") %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{url_for('episodes.associations')}}">Users Watchlist</a>
+                </li>
+                {% endif %}
                 {% endif %}
             </ul>
             {% if  current_user.is_authenticated %}

@@ -9,7 +9,9 @@
                 <div class="card-header">
                     <h3 class="card-title display-6 text-center">Profile</h3>
                 </div>
+                
                 <div class="card-body">
+                    {% if is_my_profile%}
                     <form method="POST">
                         {{ form.hidden_tag() }}
                         {{ render_field(form.username, class="form-control", placeholder="Username") }}
@@ -19,6 +21,13 @@
                         {{ render_field(form.confirm, class="form-control", placeholder="Confirm Password") }}
                         {{ form.submit(class="btn btn-primary mt-3") }}
                     </form>
+                    {% else %}
+                    <p>You are visiting {{form.username.data}}'s profile </p>
+                    <p> Checkout their Watchlist
+                        <a href= "{{url_for('episodes.watchlist', id= request.args.get("id"))}}" class ="btn btn-primary"> View Watchlist</a>
+                    </p>
+
+                    {%endif%}
                 </div>
             </div>
         </div>
