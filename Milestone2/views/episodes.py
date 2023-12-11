@@ -5,6 +5,19 @@ from roles.permissions import admin_permission
 
 episodes = Blueprint('episodes', __name__, url_prefix='/episodes')
 
+
+def get_totals(partial_query, args={}):
+    try:
+        print(partial_query)
+        result = DB.selectOne("""SELECT count(1) as total FROM """ +  partial_query, args)
+        if result.status and result.row:
+            total = int(result.row["total"])
+    except Exception as e:
+        print(f"Error in totals:{e}")
+        total = 0
+    return total
+    
+
 @episodes.route('/list', methods=["GET"])
 @login_required
 # sb2648, 12/03/23
@@ -46,7 +59,9 @@ def get_episodes():
             return jsonify({"status": "error", "message": "Failed to fetch episodes data"})
     except Exception as e:
         flash("Error occured" + str(e), "error")
-    return render_template("list_episodes.html", rows=rows)
+        
+    total_records = get_totals("episodes")
+    return render_template("list_episodes.html", rows=rows, total_records=total_records)
 
 # sb2648, 12/03/23
 # Logic to get episodes for particluar season
@@ -216,7 +231,6 @@ def edit_episode():
             
             if result.status:
                 row = result.row
-                #print(f"Episode row: {row}")
                 return render_template("manage_episodes.html",episode=row) 
             else:
                 flash("An error occurred while fetching the episode record. Please try again later.", "danger")
@@ -267,7 +281,6 @@ def track():
                 if result.status:
                     flash("Added to watchlist", "success")
                 else:
-                    print("FGHJKLKJHGFDGHJK<L")
                     print(result.status)
                     flash(f"Not added {result.status}")
             except Exception as e:
@@ -324,21 +337,23 @@ def watchlist():
             return jsonify({"status": "error", "message": "Failed to fetch episodes data"})
     except Exception as e:
         flash("Error occured" + str(e), "error")
-    return render_template("list_episodes.html", rows=rows, title = "Watchlist")
+        
+    total_records = get_totals("episodes e JOIN episodes_watchlist w ON e.id = w.episode_id WHERE w.user_id = %(user_id)s ", {"user_id": watchlist_id})
+    return render_template("list_episodes.html", rows=rows, title = "Watchlist", total_records = total_records)
 
 @episodes.route('/clear', methods=["GET"])
 
 def clear():
-    id = request.args.get("id")
+    userid = request.args.get("id")
     args = {**request.args}
     if "id" in args:
         del args["id"]
     
-    if not id:
+    if not userid:
         flash("Missing id. Unable to add to watchlist.", "danger")
     else:
-        if id == current_user.id or current_user.has_role("Admin"):
-            result = DB.delete("DELETE FROM episodes_watchlist WHERE user_id = %(user_id)s", {"user_id":id})
+        if userid == current_user.id or current_user.has_role("Admin"):
+            result = DB.delete("DELETE FROM episodes_watchlist WHERE user_id = %(user_id)s", {"user_id":userid})
             try:
                 if result.status:
                     flash("Watchlist cleared", "success")
@@ -347,3 +362,6 @@ def clear():
             except Exception as e:
                 flash("Error occured while clearing watchlist" + str(e), "error")
     return redirect(url_for("episodes.watchlist", **args))
+
+
+    
