@@ -416,23 +416,24 @@ def associations():
     return render_template("admin_watchlist.html", rows=rows, total_records = total_records, username=username, title = "Users Episodes Watchlist")
 
 @episodes.route("/unwatched", methods=["GET"])
-@admin_permission.require(http_exception=403)
+# @admin_permission.require(http_exception=403)
 @login_required
 def unwatched():
     rows = []
-    args = {}    
+    args = {"user_id": current_user.id}    
     episode_name = request.args.get("episode_name")
     limit = request.args.get("limit", 10)
-    username = request.args.get("username")
     season_number = request.args.get("season_number")
     
-    query = """SELECT u.id as user_id, username, e.*,1 as 'is_assoc' FROM episodes e JOIN episodes_watchlist w ON e.id = w.episode_id LEFT JOIN IS601_Users u on u.id = w.user_id 
-    WHERE 1=1"""
-    where = ""
-    
-    if username:
-        args["username"] = f"%{username}%"
-        where += " AND username LIKE %(username)s"
+    query = """SELECT e.*,
+    IFNULL((SELECT COUNT(1) FROM episodes_watchlist w WHERE user_id = %(user_id)s AND episode_id = e.id),0) as 'is_assoc'
+    FROM  episodes e
+    WHERE e.id not in (SELECT DISTINCT episode_id FROM episodes_watchlist WHERE episode_id = e.id)
+    """
+    where =""
+    # if username:
+    #     args["username"] = f"%{username}%"
+    #     where += " AND username LIKE %(username)s"
     if episode_name:
         args["episode_name"] = f"%{episode_name}%"
         where += " AND name LIKE %(episode_name)s"
@@ -460,6 +461,6 @@ def unwatched():
     except Exception as e:
         flash("Error occured" + str(e), "error")
         
-    total_records = get_totals("episodes e JOIN episodes_watchlist w ON e.id = w.episode_id")
+    total_records = get_totals("episodes e WHERE e.id not in (SELECT DISTINCT episode_id FROM episodes_watchlist) ")
     print(total_records)
-    return render_template("admin_watchlist.html", rows=rows, total_records = total_records, username=username, title = "Users Episodes Watchlist")
+    return render_template("unwatchedlist.html", rows=rows, total_records = total_records, title = "Unwatched Episodes")
