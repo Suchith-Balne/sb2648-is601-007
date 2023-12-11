@@ -54,8 +54,6 @@ def get_episodes():
 @login_required
 def get_episodes_by_season(season_id):
     try:
-        print(f"Season ID: {season_id}")
-        # Replace "SELECT * FROM episodes" with your actual query
         query = """
             SELECT episodes.*, seasons.name AS season_name, seasons.overview AS season_overview
             FROM episodes
@@ -282,3 +280,70 @@ def track():
             print(f"Error occured while track/untrack {e}")
             flash("An unhandled error occured.Please try again" + str(e), "error")
     return redirect(url_for("episodes.get_episodes", **args))
+
+@episodes.route('/watchlist', methods=["GET"])
+def watchlist():
+    watchlist_id = request.args.get('id', current_user.id)
+    rows = []
+    args = {"user_id": watchlist_id}
+    episode_name = request.args.get("episode_name")
+    limit = request.args.get("limit", 10)
+    season_number = request.args.get("season_number")
+    
+    query = """SELECT e.*,1 as 'is_assoc'
+    FROM episodes e 
+    JOIN
+    episodes_watchlist w ON e.id = w.episode_id
+    WHERE w.user_id = %(user_id)s"""
+    
+    where = ""
+    
+    if episode_name:
+        args["episode_name"] = f"%{episode_name}%"
+        where += " AND name LIKE %(episode_name)s"
+    if season_number:
+        args["season_number"] = f"{season_number}"
+        where += " AND season_number = %(season_number)s"
+    try:
+        if 1 <= int(limit) <= 100:
+            args["limit"] = int(limit)
+            where += " LIMIT %(limit)s"
+        else:
+            raise ValueError("Limit must be a number between 1 and 100")
+    except ValueError as e:
+        flash(str(e), "danger")
+    
+    try:
+        print(f"Query: {query}")
+        print(f"Args: {args}")
+        result = DB.selectAll(query, args)
+        if result.status:
+            rows = result.rows
+            print(f"Episode rows: {rows}")
+        else:
+            return jsonify({"status": "error", "message": "Failed to fetch episodes data"})
+    except Exception as e:
+        flash("Error occured" + str(e), "error")
+    return render_template("list_episodes.html", rows=rows, title = "Watchlist")
+
+@episodes.route('/clear', methods=["GET"])
+
+def clear():
+    id = request.args.get("id")
+    args = {**request.args}
+    if "id" in args:
+        del args["id"]
+    
+    if not id:
+        flash("Missing id. Unable to add to watchlist.", "danger")
+    else:
+        if id == current_user.id or current_user.has_role("Admin"):
+            result = DB.delete("DELETE FROM episodes_watchlist WHERE user_id = %(user_id)s", {"user_id":id})
+            try:
+                if result.status:
+                    flash("Watchlist cleared", "success")
+                else:
+                    flash("Unable to clear watchlist", "danger")
+            except Exception as e:
+                flash("Error occured while clearing watchlist" + str(e), "error")
+    return redirect(url_for("episodes.watchlist", **args))

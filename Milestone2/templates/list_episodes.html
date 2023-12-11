@@ -2,7 +2,7 @@
 {% block title %}Episodes list{% endblock %}
 {% block content %}
 <div class="container-fluid mt-2">
-    <h1 class="display-4 text-center">Episodes</h1>
+    <h1 class="display-4 text-center">{{title if title else "Episodes" }}</h1>
     <!-- sb2648, 10/05/2023 -->
     <!-- HTML form to add episodes -->
     <form method="GET">
@@ -31,6 +31,13 @@
 
     <!-- sb2648, 11/19/2023 -->
     <!-- Logic to render episodes -->
+    {%if current_user.is_authenticated and current_user.has_role('Admin')%}
+    <form action="{{url_for('episodes.clear', id = request.args.get('id', current_user.id))}}" onsubmit="return confirm("Are you sure?")">
+        <input type="hidden" name="id" value="{{request.args.get('id', current_user.id)}}">
+        <input type="submit" class= "btn btn-danger mt-2" value="Clear Watchlist">
+    </form>
+    {% endif%}
+
     <div class="row row-cols-1 row-cols-md-5 g-4">
         {% if rows and rows|length > 0 %}
             {% for episode in rows %}
