@@ -11,12 +11,14 @@
                 <div class="card">
                     <img src="{{ season.poster_url }}" class="card-img-top" alt="Poster" >
                     <div class="card-body">
-                        <h5 class="card-title"><a href="{{ url_for('episodes.get_episodes_by_season', season_id=season.id) }}">{{ season.name }}</a></h5>
+                        <h5 class="card-title"><a href="{{ url_for('episodes.get_episodes_by_season', season_id=season.id) }}">{{ season.name}}</a></h5>
                         <p>{{ season.episode_count }} Episodes </p>
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item font-weight-bold"><strong>Release Date</strong> <br> {{ season.air_date }}</li>
+                            {%if current_user.is_authenticated and current_user.has_role('Admin')%}
                             <a href="{{ url_for('seasons.edit_season', id=season['id']) }}" class="btn btn-primary m-1">Edit</a>
                             <a href="{{ url_for('seasons.delete_season', id=season['id']) }}" class="btn btn-danger m-1"> Delete </a>
+                            {%endif%}
                         </ul>
                     </div>
                 </div>
