@@ -7,7 +7,6 @@ on:
   push:
     branches:
       - dev
-      - Milestone31
 
 # Your workflows jobs.
 jobs:

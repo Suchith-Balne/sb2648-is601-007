@@ -263,6 +263,8 @@ def delete_episode():
             flash("Error occured" + str(e), "error")
     return redirect(url_for("episodes.get_episodes"))
 
+# sb2648, 12/03/23
+# Logic to track or untrack episode from database
 @episodes.route('/track', methods=["GET"])
 @login_required
 def track():
@@ -294,6 +296,8 @@ def track():
             flash("An unhandled error occured.Please try again" + str(e), "error")
     return redirect(url_for("episodes.get_episodes", **args))
 
+# sb2648, 12/03/23
+# Logic to add episodes to watchlist
 @episodes.route('/watchlist', methods=["GET"])
 @login_required
 def watchlist():
@@ -342,6 +346,8 @@ def watchlist():
     total_records = get_totals("episodes e JOIN episodes_watchlist w ON e.id = w.episode_id WHERE w.user_id = %(user_id)s ", {"user_id": watchlist_id})
     return render_template("list_episodes.html", rows=rows, title = "Watchlist", total_records = total_records)
 
+# sb2648, 12/03/23
+# Logic to clear episodes from watchlist
 @episodes.route('/clear', methods=["GET"])
 @login_required
 def clear():
@@ -364,7 +370,8 @@ def clear():
                 flash("Error occured while clearing watchlist" + str(e), "error")
     return redirect(url_for("episodes.watchlist", **args))
 
-
+# sb2648, 12/03/23
+# Logic to associate episodes to the user
 @episodes.route("/associations", methods=["GET"])
 @admin_permission.require(http_exception=403)
 @login_required
@@ -415,6 +422,8 @@ def associations():
     print(total_records)
     return render_template("admin_watchlist.html", rows=rows, total_records = total_records, username=username, title = "Users Episodes Watchlist")
 
+# sb2648, 12/03/23
+# Logic to associate episodes to the user
 @episodes.route("/unwatched", methods=["GET"])
 # @admin_permission.require(http_exception=403)
 @login_required
@@ -463,6 +472,8 @@ def unwatched():
     print(total_records)
     return render_template("unwatchedlist.html", rows=rows, total_records = total_records, title = "Unwatched Episodes")
 
+# sb2648, 12/03/23
+# Logic to manage association episodes to the user
 @episodes.route("/manage", methods=["GET"])
 @admin_permission.require(http_exception=403)
 @login_required
@@ -482,6 +493,8 @@ def manage():
             episodes = result.rows
     return render_template("episodes_association.html", users=users, episodes=episodes, title = "Manage")
 
+# sb2648, 12/03/23
+# Logic to manage association episodes to the user
 @episodes.route("/manage_association", methods=["POST"])
 @admin_permission.require(http_exception=403)
 @login_required
