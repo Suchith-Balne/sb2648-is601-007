@@ -21,7 +21,7 @@
                 {% else %}
 
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button"
+                        <a class="nav-link dropdown-toggle active" href="#" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
                             Seasons
                         </a>
@@ -35,7 +35,7 @@
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button"
+                        <a class="nav-link active dropdown-toggle" href="#" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
                             Episodes
                         </a>
@@ -48,18 +48,21 @@
                             {%endif%}
                         </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url_for('auth.profile')}}">Profile</a>
+                    <li class="nav-item ">
+                        <a class="nav-link active" href="{{url_for('auth.profile')}}">Profile</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{url_for('episodes.watchlist')}}">Watchlist</a>
+                        <a class="nav-link active" href="{{url_for('episodes.watchlist')}}">Watchlist</a>
                     </li>
                     {% if current_user.has_role("Admin") %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{url_for('episodes.associations')}}">Users Watchlist</a>
+                        <li class="nav-item ">
+                            <a class="nav-link active" href="{{url_for('episodes.associations')}}">Users Watchlist</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{url_for('episodes.manage')}}">Users Association</a>
+                            <a class="nav-link active" href="{{url_for('episodes.manage')}}">Users Association</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{url_for('title.update_data')}}">Update Database</a>
                         </li>
                     {% endif %}
                 {% endif %}
@@ -67,8 +70,8 @@
             {% if  current_user.is_authenticated %}
                 <ul class="nav navbar-nav navbar-right">
                     <li class="nav-item ml-2">
-                        <a class="nav-link ms-auto pull-right " href="{{url_for('auth.logout')}}">
-                            <i class="bi bi-box-arrow-in-right"> Logout</i>
+                        <a class="nav-link active ms-auto pull-right " href="{{url_for('auth.logout')}}">
+                            <i class="bi bi-box-arrow-in-right"></i> Logout
                             </a>
                     </li>
                 </ul>
