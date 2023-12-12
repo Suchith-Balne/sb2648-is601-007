@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+{% block title %}User association{% endblock %}
+{% block content %}
+<div class="container mt-2">
+    <h1 class="display-4 text-center">User association</h1>
+    <form method="GET">
+        <div class="row">
+            <div class="col-auto">
+                <label class="form-label" for="username">Username</label>
+                <input type="text" name="username" class="form-control" id="username" placeholder="Username"
+                    value="{{request.args.get('username') or ''}}">
+            </div>
+            <div class="col-auto">
+                <label class="form-label" for="episode_name">Episode Name</label>
+                <input type="text" name="episode_name" class="form-control" id="episode_name" placeholder="Episode Name"
+                    value="{{request.args.get('episode_name') or ''}}">
+            </div>
+            <div class="col-auto">
+                <input type="submit" class="btn btn-primary form-control mt-4" value="Filter" />
+            </div>
+            <div class="col-auto">
+                <a href="?" class="btn btn-secondary form-control mt-4">Reset</a>
+            </div>
+        </div>
+    </form>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Users</th>
+                <th>Association</th>
+                <th>Episodes</th>
+            </tr>
+        </thead>
+        
+        <tbody>
+            <tr>
+                <td>
+                    {%for user in users%}
+                    <input form="apply" type="checkbox" class="form-check" name="users[]" value="{{user.get('id')}}"/>{{user.username}}
+                    {%endfor%}
+                    
+                </td>
+                <td>
+                    <form id="apply" action="{{url_for('episodes.manage_assoc')}}" method="POST">
+                        <input type="submit" value="Apply" class="btn btn-success mt-2">
+                    </form>
+                </td>
+                <td>
+                    {%for episode in episodes%}
+                    <input form="apply" type="checkbox" class="form-check" name="episodes[]" value="{{episode.get('id')}}"/>{{episode.name}}
+                    {%endfor%}
+                </td>
+            </tr>
+        </tbody>
+
+    </table>
+</div>
+{% endblock %}

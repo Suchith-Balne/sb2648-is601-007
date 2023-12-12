@@ -1,12 +1,17 @@
 {% extends "layout.html" %}
-{% block title %}{{title if title else "Episodes" }}{% endblock %}
+{% block title %}Episodes list{% endblock %}
 {% block content %}
 <div class="container-fluid mt-2">
     <h1 class="display-4 text-center">{{title if title else "Episodes" }}</h1>
-    <!-- sb2648, 10/05/2023 -->
-    <!-- HTML form to add episodes -->
+    <!-- sb2648, 12/11/2023 -->
+    <!-- HTML form to search episodes -->
     <form method="GET">
         <div class="row">
+            <div class="col-auto">
+                <label class="form-label" for="username">Username</label>
+                <input type="text" name="username" class="form-control" id="username" placeholder="Username"
+                    value="{{request.args.get('username') or ''}}">
+            </div>
             <div class="col-auto">
                 <label class="form-label" for="episode_name">Episode Name</label>
                 <input type="text" name="episode_name" class="form-control" id="episode_name" placeholder="Episode Name"
@@ -29,7 +34,7 @@
             </div>
         </form>
 
-    <!-- sb2648, 11/19/2023 -->
+    <!-- sb2648, 12/11/20233 -->
     <!-- Logic to render episodes -->
     {%if current_user.is_authenticated and current_user.has_role('Admin')%}
     <form action="{{url_for('episodes.clear', id = request.args.get('id', current_user.id))}}" onsubmit="return confirm("Are you sure?")">
@@ -52,6 +57,7 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ episode.name }}</h5>
                             <ul class="list-group list-group-flush">
+                                <li class="list-group-item"> <strong>Username </strong> <a href="{{url_for('auth.profile', id=episode['user_id'])}}">{{ episode.username }}</a></li>
                                 <li class="list-group-item"> <strong>Episode </strong> {{ episode.episode_number }}</li>
                                 <li class="list-group-item"> <strong>Season </strong>{{ episode.season_number }}</li>
                                 <li class="list-group-item"><strong>Release Date </strong> {{ episode.release_date }}</li>
@@ -94,11 +100,11 @@
                     </div>
                 </div>
             {% endfor %}
-        {% else %}
+            {% else %}
             <div class="container">
-                <p class="text-danger"> No episodes, try changing filter criteria </p>
+                <p class="text-danger"> No episodes,try changing filter criteria </p>
             </div>
         {% endif %}
     </div>
-    
+</div>
 {% endblock %}
