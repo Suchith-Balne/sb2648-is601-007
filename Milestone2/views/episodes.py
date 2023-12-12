@@ -1,26 +1,43 @@
 from sql.db import DB
 from flask import Blueprint, redirect, render_template, request, flash, url_for, jsonify
+from flask_login import login_user, login_required, logout_user, current_user
+from roles.permissions import admin_permission
 
 episodes = Blueprint('episodes', __name__, url_prefix='/episodes')
 
+
+def get_totals(partial_query, args={}):
+    try:
+        result = DB.selectOne("""SELECT count(1) as total FROM """ +  partial_query, args)
+        if result.status and result.row:
+            total = int(result.row["total"])
+    except Exception as e:
+        print(f"Error in totals:{e}")
+        total = 0
+    return total
+    
+
 @episodes.route('/list', methods=["GET"])
+@login_required
 # sb2648, 12/03/23
 # Logic to get all the episodes list and filter the list from the form
 def get_episodes():
     rows = []
-    args = {}
+    args = {"user_id": current_user.id}
     episode_name = request.args.get("episode_name")
     limit = request.args.get("limit", 10)
-    season_number = request.args.get("season number")
+    season_number = request.args.get("season_number")
     
-    query = "SELECT * FROM episodes WHERE 1=1"
+    query = """SELECT episodes.*,
+    IFNULL((SELECT COUNT(1) FROM episodes_watchlist WHERE user_id = %(user_id)s AND episode_id = episodes.id),0) as `is_assoc` FROM  episodes
+    WHERE 1=1"""
     
     if episode_name:
         query += " AND name LIKE %(episode_name)s"
         args["episode_name"] = f"%{episode_name}%"
     if season_number:
         query += " AND season_number = %(season_number)s"
-        args["season_number"] = f"%{season_number}%"
+        args["season_number"] = f"{season_number}"
     try:
         if 1 <= int(limit) <= 100:
             query += " LIMIT %(limit)s"
@@ -31,6 +48,8 @@ def get_episodes():
         flash(str(e), "danger")
     
     try:
+        print(f"Query: {query}")
+        print(f"Args: {args}")
         result = DB.selectAll(query, args)
         if result.status:
             rows = result.rows
@@ -39,40 +58,43 @@ def get_episodes():
             return jsonify({"status": "error", "message": "Failed to fetch episodes data"})
     except Exception as e:
         flash("Error occured" + str(e), "error")
-    return render_template("list_episodes.html", rows=rows)
+        
+    total_records = get_totals("episodes")
+    return render_template("list_episodes.html", rows=rows, total_records=total_records)
 
 # sb2648, 12/03/23
 # Logic to get episodes for particluar season
 @episodes.route('/<int:season_id>', methods=["GET"])
+@login_required
 def get_episodes_by_season(season_id):
+    rows = []
+    args = {"user_id": current_user.id}
+    episode_name = request.args.get("episode_name")
+    limit = request.args.get("limit", 10)
+    season_number = request.args.get("season_number")
     try:
-        print(f"Season ID: {season_id}")
-        # Replace "SELECT * FROM episodes" with your actual query
         query = """
             SELECT episodes.*, seasons.name AS season_name, seasons.overview AS season_overview
             FROM episodes
             JOIN seasons ON episodes.season_id = seasons.id
-            WHERE episodes.season_id = %s;
+            WHERE episodes.season_id = %s
         """
         result = DB.selectAll(query, season_id)
         if result.status:
             rows = result.rows
-            if rows:
-                season_name = rows[0]['season_name']
-                season_overview = rows[0]['season_overview']
-            else:
-                season_name = None
-                season_overview = None
             print(f"Episode rows: {rows}")
         else:
             return jsonify({"status": "error", "message": "Failed to fetch episodes data"})
     except Exception as e:
         flash("Error occured" + str(e), "error")
-    return render_template("episodes_for_season.html", rows=rows, season_id=season_id,season_name=season_name, season_overview=season_overview)
+    total_records = get_totals("episodes")
+    return render_template("list_episodes.html", rows=rows, season_id=season_id,total_records=total_records )
 
 # sb2648, 12/03/23
 # Logic to add episode to the database
 @episodes.route('/add', methods=["GET","POST"])
+@admin_permission.require(http_exception=403)
+@login_required
 def add_episode():
     if request.method == "POST":
         season_id = request.form.get("season_id")
@@ -137,6 +159,8 @@ def add_episode():
 # sb2648, 12/03/23
 # Logic to edit episode and perform update to the database
 @episodes.route('/edit', methods=["GET","POST"])
+@admin_permission.require(http_exception=403)
+@login_required
 def edit_episode():
     episode_id = request.args.get('id')
     if not episode_id:
@@ -206,7 +230,6 @@ def edit_episode():
             
             if result.status:
                 row = result.row
-                print(f"Episode row: {row}")
                 return render_template("manage_episodes.html",episode=row) 
             else:
                 flash("An error occurred while fetching the episode record. Please try again later.", "danger")
@@ -219,6 +242,8 @@ def edit_episode():
 # sb2648, 12/03/23
 # Logic to delete episode from database
 @episodes.route('/delete', methods=["GET"])
+@admin_permission.require(http_exception=403)
+@login_required
 def delete_episode():
     episode_id = request.args.get('id')
 
@@ -237,3 +262,268 @@ def delete_episode():
         except Exception as e:
             flash("Error occured" + str(e), "error")
     return redirect(url_for("episodes.get_episodes"))
+
+# sb2648, 12/03/23
+# Logic to track or untrack episode from database
+@episodes.route('/track', methods=["GET"])
+@login_required
+def track():
+    episode_id = request.args.get('id')
+    print(episode_id)
+    args = {**request.args}
+    del args["id"]
+    if not episode_id:
+        flash("Missing id. Unable to add to watchlist.", "danger")
+    else:
+        args = {"user_id": current_user.id, "episode_id": episode_id}
+        try:
+            try:
+                result = DB.insertOne("INSERT INTO episodes_watchlist (user_id, episode_id) VALUES (%(user_id)s, %(episode_id)s)", args)
+                print(result.status)
+                if result.status:
+                    flash("Added to watchlist", "success")
+                else:
+                    print(result.status)
+                    flash(f"Not added {result.status}")
+            except Exception as e:
+                print(e)
+                print(f"Duplicate ececption can be ignored {e}")
+                result = DB.delete("DELETE FROM episodes_watchlist WHERE user_id = %(user_id)s AND episode_id = %(episode_id)s", args)
+                if result.status:
+                    flash("Removed from watchlist", "success")
+        except Exception as e:
+            print(f"Error occured while track/untrack {e}")
+            flash("An unhandled error occured.Please try again" + str(e), "error")
+    return redirect(url_for("episodes.get_episodes", **args))
+
+# sb2648, 12/03/23
+# Logic to add episodes to watchlist
+@episodes.route('/watchlist', methods=["GET"])
+@login_required
+def watchlist():
+    watchlist_id = request.args.get('id', current_user.id)
+    rows = []
+    args = {"user_id": watchlist_id}
+    episode_name = request.args.get("episode_name")
+    limit = request.args.get("limit", 10)
+    season_number = request.args.get("season_number")
+    
+    query = """SELECT e.*,1 as 'is_assoc'
+    FROM episodes e 
+    JOIN
+    episodes_watchlist w ON e.id = w.episode_id
+    WHERE w.user_id = %(user_id)s"""
+    
+    where = ""
+    
+    if episode_name:
+        args["episode_name"] = f"%{episode_name}%"
+        where += " AND name LIKE %(episode_name)s"
+    if season_number:
+        args["season_number"] = f"{season_number}"
+        where += " AND season_number = season_number"
+    try:
+        if 1 <= int(limit) <= 100:
+            args["limit"] = int(limit)
+            where += " LIMIT %(limit)s"
+        else:
+            raise ValueError("Limit must be a number between 1 and 100")
+    except ValueError as e:
+        flash(str(e), "danger")
+    
+    try:
+        print(f"Query: {query+where}")
+        print(f"Args: {args}")
+        result = DB.selectAll(query+where, args)
+        if result.status:
+            rows = result.rows
+            print(f"Episode rows: {rows}")
+        else:
+            return jsonify({"status": "error", "message": "Failed to fetch episodes data"})
+    except Exception as e:
+        flash("Error occured" + str(e), "error")
+        
+    total_records = get_totals("episodes e JOIN episodes_watchlist w ON e.id = w.episode_id WHERE w.user_id = %(user_id)s ", {"user_id": watchlist_id})
+    return render_template("list_episodes.html", rows=rows, title = "Watchlist", total_records = total_records)
+
+# sb2648, 12/03/23
+# Logic to clear episodes from watchlist
+@episodes.route('/clear', methods=["GET"])
+@login_required
+def clear():
+    userid = request.args.get("id")
+    args = {**request.args}
+    if "id" in args:
+        del args["id"]
+    
+    if not userid:
+        flash("Missing id. Unable to add to watchlist.", "danger")
+    else:
+        if userid == current_user.id or current_user.has_role("Admin"):
+            result = DB.delete("DELETE FROM episodes_watchlist WHERE user_id = %(user_id)s", {"user_id":userid})
+            try:
+                if result.status:
+                    flash("Watchlist cleared", "success")
+                else:
+                    flash("Unable to clear watchlist", "danger")
+            except Exception as e:
+                flash("Error occured while clearing watchlist" + str(e), "error")
+    return redirect(url_for("episodes.watchlist", **args))
+
+# sb2648, 12/03/23
+# Logic to associate episodes to the user
+@episodes.route("/associations", methods=["GET"])
+@admin_permission.require(http_exception=403)
+@login_required
+def associations():
+    rows = []
+    args = {}
+    
+    episode_name = request.args.get("episode_name")
+    limit = request.args.get("limit", 10)
+    username = request.args.get("username")
+    season_number = request.args.get("season_number")
+    
+    query = """SELECT u.id as user_id, username, e.*,1 as 'is_assoc' FROM episodes e JOIN episodes_watchlist w ON e.id = w.episode_id LEFT JOIN IS601_Users u on u.id = w.user_id 
+    WHERE 1=1"""
+    where = ""
+    
+    if username:
+        args["username"] = f"%{username}%"
+        where += " AND username LIKE %(username)s"
+    if episode_name:
+        args["episode_name"] = f"%{episode_name}%"
+        where += " AND name LIKE %(episode_name)s"
+    if season_number:
+        args["season_number"] = f"{season_number}"
+        where += " AND season_number = season_number"
+    try:
+        if 1 <= int(limit) <= 100:
+            args["limit"] = int(limit)
+            where += " LIMIT %(limit)s"
+        else:
+            raise ValueError("Limit must be a number between 1 and 100")
+    except ValueError as e:
+        flash(str(e), "danger")
+    
+    try:
+        print(f"Query: {query}")
+        print(f"Args: {args}")
+        result = DB.selectAll(query+where, args)
+        if result.status:
+            rows = result.rows
+            print(f"Episode rows: {rows}")
+        else:
+            return jsonify({"status": "error", "message": "Failed to fetch episodes data"})
+    except Exception as e:
+        flash("Error occured" + str(e), "error")
+        
+    total_records = get_totals("episodes e JOIN episodes_watchlist w ON e.id = w.episode_id")
+    print(total_records)
+    return render_template("admin_watchlist.html", rows=rows, total_records = total_records, username=username, title = "Users Episodes Watchlist")
+
+# sb2648, 12/03/23
+# Logic to associate episodes to the user
+@episodes.route("/unwatched", methods=["GET"])
+# @admin_permission.require(http_exception=403)
+@login_required
+def unwatched():
+    rows = []
+    args = {"user_id": current_user.id}    
+    episode_name = request.args.get("episode_name")
+    limit = request.args.get("limit", 10)
+    season_number = request.args.get("season_number")
+    
+    query = """SELECT e.*,
+    IFNULL((SELECT COUNT(1) FROM episodes_watchlist w WHERE user_id = %(user_id)s AND episode_id = e.id),0) as 'is_assoc'
+    FROM  episodes e
+    WHERE e.id not in (SELECT DISTINCT episode_id FROM episodes_watchlist WHERE episode_id = e.id)
+    """
+    where =""
+
+    if episode_name:
+        args["episode_name"] = f"%{episode_name}%"
+        where += " AND name LIKE %(episode_name)s"
+    if season_number:
+        args["season_number"] = f"{season_number}"
+        where += " AND season_number = season_number"
+    try:
+        if 1 <= int(limit) <= 100:
+            args["limit"] = int(limit)
+            where += " LIMIT %(limit)s"
+        else:
+            raise ValueError("Limit must be a number between 1 and 100")
+    except ValueError as e:
+        flash(str(e), "danger")
+    
+    try:
+        print(f"Query: {query}")
+        print(f"Args: {args}")
+        result = DB.selectAll(query+where, args)
+        if result.status:
+            rows = result.rows
+            print(f"Episode rows: {rows}")
+        else:
+            return jsonify({"status": "error", "message": "Failed to fetch episodes data"})
+    except Exception as e:
+        flash("Error occured" + str(e), "error")
+        
+    total_records = get_totals("episodes e WHERE e.id not in (SELECT DISTINCT episode_id FROM episodes_watchlist) ")
+    print(total_records)
+    return render_template("unwatchedlist.html", rows=rows, total_records = total_records, title = "Unwatched Episodes")
+
+# sb2648, 12/03/23
+# Logic to manage association episodes to the user
+@episodes.route("/manage", methods=["GET"])
+@admin_permission.require(http_exception=403)
+@login_required
+def manage():
+    users = []
+    episodes = []
+    username = request.args.get("username")
+    episode_name = request.args.get("episode_name")
+    print(username)
+    print(episode_name)
+    if username and episode_name:
+        result = DB.selectAll("SELECT id, username FROM IS601_Users WHERE username like %(username)s LIMIT 25", {"username":f"%{username}%"})
+        if result.status and result.rows:
+            users = result.rows
+        result = DB.selectAll("SELECT id, name FROM episodes WHERE name like %(episode_name)s LIMIT 25", {"episode_name":f"%{episode_name}%"})
+        if result.status and result.rows:
+            episodes = result.rows
+    return render_template("episodes_association.html", users=users, episodes=episodes, title = "Manage")
+
+# sb2648, 12/03/23
+# Logic to manage association episodes to the user
+@episodes.route("/manage_association", methods=["POST"])
+@admin_permission.require(http_exception=403)
+@login_required
+def manage_assoc():
+    users = request.form.getlist("users[]")
+    episodes = request.form.getlist("episodes[]")
+    print(users, episodes)
+    args = {**request.args}
+    if users and episodes: # we need both for this to work
+        mappings = []
+        for user in users:
+            for episode in episodes:
+                mappings.append({"user_id": user, "episode_id":episode})
+        if len(mappings) > 0:
+            for mapping in mappings:
+                try:
+                    result = DB.insertOne("INSERT INTO episodes_watchlist (user_id, episode_id) VALUES(%(user_id)s, %(episode_id)s) ", mapping)
+                    if result.status:
+                        pass
+                except Exception as e:
+                    print(f"Exception occured while associating eppisodes: {e}")
+                    DB.delete("DELETE from episodes_watchlist where user_id = %(user_id)s and episode_id = %(episode_id)s", mapping)
+            flash("Successfully associated/unassociated episodes for the user", "success")
+        else:
+            flash("No user/episode mappings", "danger")
+
+    if "users" in args:
+        del args["users"]
+    if "episodes" in args:
+        del args["episodes"]
+    return redirect(url_for("episodes.manage", **args))
+            

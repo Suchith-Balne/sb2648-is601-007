@@ -1,9 +1,17 @@
 {% extends "layout.html" %}
 {% block title %}Landing Page{% endblock %}
 {% block content %}
-<div class="container-fluid ">
-    <div class="jumbotron d-flex align-items-center justify-content-center min-vh-100">
-        <h1 class="display-4">Welcome {{current_user.username}}</h1>
-    </div>
+<div class="container mt-3">
+    <div class="card">
+        <h5 class="card-header display-3 text-center">Movie Entertainer</h5>
+        <div class="card-body">
+          <h5 class="card-title display-5 text-center">Welcome {{current_user.username}}</h5>
+          <p class="card-text text-center">Explore all the series and episodes</p>
+          <div class="d-flex justify-content-center">
+            <a href="{{url_for('episodes.get_episodes')}}" class="btn btn-primary m-2">Episodes</a>
+            <a href="{{url_for('seasons.get_seasons')}}" class="btn btn-primary m-2">Seasons</a>
+          </div>
+        </div>
+      </div>
 </div>
 {% endblock %}

@@ -1,11 +1,15 @@
 from flask import Blueprint, render_template, jsonify
 from sql.db import DB
 from flask import Blueprint, redirect, render_template, request, flash, url_for
+from flask_login import login_user, login_required, logout_user, current_user
+from roles.permissions import admin_permission
+
 seasons = Blueprint('seasons', __name__, url_prefix='/seasons')
 
 # sb2648, 12/03/23
 # Logic to get all the seasons from the database and display them on the list page
 @seasons.route('/list', methods=["GET"])
+@login_required
 def get_seasons():
     try:
         result = DB.selectAll("SELECT * FROM seasons")
@@ -21,6 +25,8 @@ def get_seasons():
 # sb2648, 12/03/23
 # Logic to add season to the database 
 @seasons.route('/add', methods=["GET", "POST"])
+@admin_permission.require(http_exception=403)
+@login_required
 def add_season():
     if request.method == "POST":
         season_id = request.form.get("season_id")
@@ -78,6 +84,8 @@ def add_season():
 # sb2648, 12/03/23
 # Logic to edit seasons from the list page  and perform update to the database
 @seasons.route("/edit", methods=["GET", "POST"])
+@admin_permission.require(http_exception=403)
+@login_required
 def edit_season():
     
     row = {}
@@ -155,6 +163,8 @@ def edit_season():
 # sb2648, 12/05/23
 # Logic to delete episode from database
 @seasons.route("/delete", methods=["GET"])
+@login_required
+@admin_permission.require(http_exception=403)
 def delete_season():
     season_id = request.args.get('id')
     if not season_id:
