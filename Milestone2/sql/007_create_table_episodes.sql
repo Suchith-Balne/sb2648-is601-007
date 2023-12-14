@@ -1,7 +1,7 @@
 CREATE TABLE episodes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     season_id INT,
-    name VARCHAR(255),
+    name VARCHAR(255) UNIQUE,
     episode_number INT,
     season_number INT,
     tmdb_id INT,
