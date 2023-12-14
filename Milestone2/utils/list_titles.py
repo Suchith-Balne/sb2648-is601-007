@@ -14,7 +14,9 @@ def update_data():
     # Update seasons data
     update_seasons_data()
 
-    return jsonify(message="Data updated successfully")
+    success_message = "Data updated successfully"
+    
+    return render_template("database_update.html", success_message=success_message)
 
 # UCID: sb2648, 11/21/2023
 # Method to update the episodes data to the database

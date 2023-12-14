@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block title %}404{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1>Database update</h1>
+
+    {% if success_message %}
+        <p style="color: green;">{{ success_message }}</p>
+    {% endif %}
+</div>
+
+{% endblock %}
